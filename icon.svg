@@ -1,5 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <rect width="128" height="128" rx="32" fill="#fbf7f4" />
-  <circle cx="64" cy="64" r="48" fill="#fffaf7" stroke="#d9aa55" stroke-width="8" />
-  <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" fill="#332821" font-family="ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="36" font-weight="800">POT</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Soft background -->
+  <rect width="200" height="200" rx="45" fill="#fbf7f4" />
+  
+  <!-- Squid body -->
+  <ellipse cx="100" cy="75" rx="50" ry="55" fill="#e8b4d4"/>
+  
+  <!-- Head highlight for depth -->
+  <ellipse cx="100" cy="50" rx="38" ry="38" fill="#f3c6cf"/>
+  
+  <!-- Left eye -->
+  <circle cx="80" cy="70" r="9" fill="#fff"/>
+  <circle cx="80" cy="70" r="6" fill="#333"/>
+  <circle cx="82" cy="68" r="2.5" fill="#fff"/>
+  
+  <!-- Right eye -->
+  <circle cx="120" cy="70" r="9" fill="#fff"/>
+  <circle cx="120" cy="70" r="6" fill="#333"/>
+  <circle cx="122" cy="68" r="2.5" fill="#fff"/>
+  
+  <!-- Happy smile -->
+  <path d="M 90 85 Q 100 92 110 85" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  
+  <!-- Left tentacle 1 -->
+  <path d="M 70 120 Q 60 145 65 175" stroke="#e8b4d4" stroke-width="14" fill="none" stroke-linecap="round"/>
+  
+  <!-- Left tentacle 2 -->
+  <path d="M 82 128 Q 70 150 75 178" stroke="#e8b4d4" stroke-width="14" fill="none" stroke-linecap="round"/>
+  
+  <!-- Right tentacle 1 -->
+  <path d="M 130 120 Q 140 145 135 175" stroke="#e8b4d4" stroke-width="14" fill="none" stroke-linecap="round"/>
+  
+  <!-- Right tentacle 2 -->
+  <path d="M 118 128 Q 130 150 125 178" stroke="#e8b4d4" stroke-width="14" fill="none" stroke-linecap="round"/>
+  
+  <!-- Center tentacle holding coin -->
+  <path d="M 100 125 Q 100 145 100 168" stroke="#e8b4d4" stroke-width="14" fill="none" stroke-linecap="round"/>
+  
+  <!-- Gold coin -->
+  <circle cx="100" cy="180" r="14" fill="#ffd700"/>
+  <circle cx="100" cy="180" r="12" fill="#ffed4e"/>
+  
+  <!-- Coin shine -->
+  <circle cx="95" cy="175" r="3.5" fill="#fff" opacity="0.7"/>
+  
+  <!-- Small blush marks -->
+  <ellipse cx="55" cy="75" rx="6" ry="5" fill="#f8a8c4" opacity="0.6"/>
+  <ellipse cx="145" cy="75" rx="6" ry="5" fill="#f8a8c4" opacity="0.6"/>
 </svg>
