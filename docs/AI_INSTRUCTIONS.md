@@ -10,6 +10,18 @@ The app is not a generic expense tracker. It is built around a specific weekly a
 
 Do not remove the personal finance logic to make the app more generic.
 
+## Product philosophy
+
+This application exists to answer one primary question:
+
+"How much money can I safely spend?"
+
+Every feature should support that goal.
+
+If a feature increases complexity without making budgeting easier, it probably should not be added.
+
+Favor simplicity over feature count.
+
 ## Highest-priority rules
 
 1. Preserve the weekly allowance formula.

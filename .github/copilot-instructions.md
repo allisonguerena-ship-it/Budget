@@ -27,3 +27,15 @@ Before suggesting or making changes, follow the repo rules in:
 ## Editing style
 
 Keep the app simple, soft, mobile-friendly, and easy to use. Do not make the UI more technical or cluttered unless requested.
+
+## Development philosophy
+
+Before making changes:
+
+1. Read the relevant files in the `/docs` folder.
+2. Explain the implementation plan.
+3. Prefer the smallest safe change.
+4. Preserve backwards compatibility.
+5. Test before considering work complete.
+
+If documentation conflicts with assumptions, documentation always wins.

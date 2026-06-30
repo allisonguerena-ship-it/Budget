@@ -2,6 +2,9 @@
 .env
 .env.local
 
+# Config
+js/config.js
+
 # Dependencies
 node_modules/
 *.lock
@@ -20,7 +23,6 @@ build/
 # OS
 .DS_Store
 __MACOSX/
-Thumbs.db
 
 # Logs
 *.log
