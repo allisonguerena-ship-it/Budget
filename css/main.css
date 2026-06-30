@@ -86,3 +86,47 @@ h2 {
 .section-card {
   margin-top: 18px;
 }
+
+/* iPhone/Mobile optimizations */
+@media (max-width: 768px) {
+  body {
+    padding: 14px;
+  }
+
+  header {
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin: 0 0 4px;
+  }
+
+  h2 {
+    font-size: 18px;
+    margin: 0 0 6px;
+  }
+
+  .sub {
+    font-size: 13px;
+  }
+
+  .pill {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .panel,
+  .section-card {
+    padding: 14px;
+  }
+
+  details.section-card > summary {
+    padding: 14px;
+  }
+
+  details.section-card .inside {
+    padding: 0 14px 14px;
+  }
+}

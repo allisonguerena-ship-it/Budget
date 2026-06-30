@@ -177,3 +177,47 @@ details.section-card .inside {
     grid-template-columns: 1fr;
   }
 }
+
+/* Extra mobile (iPhone) optimizations */
+@media (max-width: 480px) {
+  .grid {
+    gap: 12px;
+  }
+
+  .week-head {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .week-title {
+    font-size: 16px;
+  }
+
+  .week-stats {
+    gap: 6px;
+    padding: 10px 14px;
+    grid-template-columns: 1fr;
+  }
+
+  .stat {
+    padding: 8px;
+  }
+
+  .stat .num {
+    font-size: 14px;
+  }
+
+  .toolbar,
+  .monthbar {
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .chartbox {
+    height: 200px;
+  }
+
+  .month-title {
+    font-size: 18px;
+  }
+}
