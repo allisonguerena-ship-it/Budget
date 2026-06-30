@@ -16,6 +16,12 @@ class AuthUI {
   }
 
   waitForCloudSync() {
+    // If cloud sync is disabled, skip waiting and just render
+    if (typeof FEATURES !== 'undefined' && !FEATURES.enableCloudSync) {
+      this.updateUI();
+      return;
+    }
+    
     if (typeof cloudSync === 'undefined' || !cloudSync || !cloudSync.initialized) {
       setTimeout(() => this.waitForCloudSync(), 100);
       return;
