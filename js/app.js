@@ -4,9 +4,9 @@ let data = null;
 
 async function initializeApp() {
   try {
-    // Try to load config dynamically
-    const configModule = await import('./config.js');
-    const { SUPABASE_CONFIG, FEATURES } = configModule;
+    // Use global config instead of importing
+    const SUPABASE_CONFIG = window.SUPABASE_CONFIG;
+    const FEATURES = window.FEATURES;
     
     if (FEATURES.enableCloudSync && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
       cloudSync = new CloudSync(SUPABASE_CONFIG);
