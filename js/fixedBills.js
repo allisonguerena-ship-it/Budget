@@ -17,6 +17,8 @@ function updateFixedBill(index, field, value) {
   if (field === "amount") value = Number(value) || 0;
   if (field === "active") value = !!value;
   bill[field] = value;
+  // debug: log updated fixed bills and current monthly fixed total
+  try { console.debug('updateFixedBill:', index, field, value, 'monthlyFixedOn(currentMonth+"-01")=', monthlyFixedOn(data.currentMonth+"-01")); } catch (e) { console.debug('updateFixedBill debug error', e); }
   save();
   render();
 }
