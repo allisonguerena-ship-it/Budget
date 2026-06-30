@@ -321,3 +321,27 @@ function resetData() {
     location.reload();
   }
 }
+
+// JSON Backup/Restore handlers
+function downloadJSONBackupHandler() {
+  const result = downloadJSONBackup(data);
+  alert(result.message);
+}
+
+function importJSONBackupHandler(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  importJSONBackupFromFile(
+    file,
+    (message) => {
+      alert(message);
+    },
+    (error) => {
+      alert(error);
+    }
+  );
+
+  // Reset file input
+  event.target.value = "";
+}

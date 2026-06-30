@@ -90,6 +90,9 @@
           <button onclick="saveCoreSettings()">Update core budget</button>
           <button class="secondary" onclick="addWeek()">+ Add next 7-day week</button>
           <button class="secondary" onclick="downloadCSV()">Export CSV backup</button>
+          <button class="secondary" onclick="downloadJSONBackupHandler()">Export JSON backup</button>
+          <input id="jsonImportInput" type="file" accept=".json" style="display:none;" onchange="importJSONBackupHandler(event)">
+          <button class="secondary" onclick="document.getElementById('jsonImportInput').click()">Import JSON backup</button>
           <button class="danger" onclick="resetData()">Reset</button>
         </div>
         <div class="note"><b>Allowance formula:</b> weekly allowance = (monthly income − fixed bills active for that week) × 12 ÷ 365 × 7. This avoids fake 4-week/5-week month math.</div>
@@ -174,6 +177,7 @@
   <script src="js/plannedExpenses.js"></script>
   <script src="js/cashflow.js"></script>
   <script src="js/charts.js"></script>
+  <script src="js/backup.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/app.js"></script>
 
