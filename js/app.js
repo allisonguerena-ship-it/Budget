@@ -3,8 +3,20 @@ let cloudSync = null;
 let data = null;
 
 async function initializeApp() {
+  // Always load local data first
+  data = loadData();
+  
+  // Render the app immediately with local data
+  render();
+  
+  // Then try to initialize cloud sync in the background
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+    });
+  }
+  
   try {
-    // Use global config instead of importing
     const SUPABASE_CONFIG = window.SUPABASE_CONFIG;
     const FEATURES = window.FEATURES;
     
@@ -12,32 +24,21 @@ async function initializeApp() {
       cloudSync = new CloudSync(SUPABASE_CONFIG);
       const syncReady = await cloudSync.init(authManager);
       
-      if (syncReady) {
+      if (syncReady && window.authUI) {
         window.authUI.updateUI();
         
         if (cloudSync.isAuthenticated()) {
-          data = await cloudSync.loadData();
-        } else {
-          data = loadData();
+          const cloudData = await cloudSync.loadData();
+          if (cloudData) {
+            data = cloudData;
+            render();
+          }
         }
-      } else {
-        data = loadData();
       }
-    } else {
-      data = loadData();
     }
   } catch (error) {
-    console.warn('Cloud sync initialization failed, using localStorage:', error);
-    data = loadData();
+    console.warn('Cloud sync initialization failed, will use localStorage:', error);
   }
-  
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./service-worker.js").catch(() => {});
-    });
-  }
-  
-  render();
 }
 
 initializeApp();
