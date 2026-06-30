@@ -1,0 +1,179 @@
+:root {
+  --bg: #fbf7f4;
+}
+
+details.section-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+details.section-card > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+details.section-card > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.section-card .inside {
+  padding: 0 20px 20px;
+}
+
+.grid {
+  display: grid;
+  gap: 18px;
+}
+
+.cards {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+ .top {
+  grid-template-columns: 1.05fr 0.95fr;
+  margin-top: 18px;
+}
+
+.plannergrid {
+  grid-template-columns: 1fr 1fr;
+  margin-top: 18px;
+}
+
+.settings {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.cashsettings {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.toolbar,
+.monthbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.toolbar.no-margin {
+  margin: 0;
+}
+
+.monthbar {
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.month-title {
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.weeks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.week {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 26px rgba(91, 64, 46, 0.08);
+}
+
+.week.finalized {
+  border-color: rgba(107, 143, 113, 0.55);
+  background: #fffdfa;
+}
+
+.week-head {
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(243, 198, 207, 0.48), rgba(191, 216, 189, 0.32));
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.week-title {
+  font-weight: 860;
+  font-size: 18px;
+}
+
+.week-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  background: #fffaf7;
+}
+
+.stat {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 10px;
+}
+
+.stat .num {
+  font-weight: 875;
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.stat.potmini {
+  opacity: 0.78;
+}
+
+.chartbox {
+  height: 260px;
+}
+
+@media (max-width: 1050px) {
+  body {
+    padding: 16px;
+  }
+
+  header,
+  .top {
+    display: block;
+  }
+
+  .cards,
+  .settings,
+  .cashsettings,
+  .weeks,
+  .plannergrid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    margin-bottom: 16px;
+  }
+
+  .week-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .event {
+    grid-template-columns: 1fr;
+  }
+}

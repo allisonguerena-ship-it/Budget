@@ -1,0 +1,63 @@
+.metric {
+  min-height: 112px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 243, 223, 0.78));
+}
+
+.metric.leftover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(191, 216, 189, 0.7));
+}
+
+.metric.spent {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(243, 198, 207, 0.65));
+}
+
+.metric.pot {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(217, 170, 85, 0.2));
+}
+
+.badge {
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 850;
+  background: #fff;
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.badge.good {
+  color: var(--good);
+}
+
+.badge.bad {
+  color: var(--bad);
+}
+
+.badge.warn {
+  color: #a36f20;
+}
+
+.table-wrap {
+  padding: 0 10px;
+  overflow-x: auto;
+}
+
+.wide-table input,
+.wide-table select {
+  min-width: 120px;
+}
+
+.wide-table .nameinput {
+  min-width: 190px;
+}
+
+.expense-actions {
+  display: flex;
+  gap: 8px;
+  padding: 14px 18px;
+  align-items: center;
+  justify-content: space-between;
+}

@@ -1,0 +1,33 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 9px 8px;
+  border-bottom: 1px solid #f0e4dd;
+  text-align: left;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+th {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  background: #fffaf7;
+}
+
+td input,
+td select {
+  padding: 8px 9px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.cashsettings > div,
+.settings > div {
+  min-width: 0;
+}
