@@ -3,6 +3,7 @@
 
 class AuthUI {
   constructor() {
+    console.log('🔐 [auth-ui.js] AuthUI constructor called');
     this.modal = document.getElementById('authModal');
     this.emailInput = document.getElementById('authEmail');
     this.passwordInput = document.getElementById('authPassword');
@@ -10,6 +11,12 @@ class AuthUI {
     this.authToggleBtn = document.getElementById('authToggleBtn');
     this.logoutBtn = document.getElementById('logoutBtn');
     this.syncStatusEl = document.getElementById('syncStatus');
+    
+    console.log('✅ [auth-ui.js] Elements found:', {
+      modal: !!this.modal,
+      authToggleBtn: !!this.authToggleBtn,
+      syncStatusEl: !!this.syncStatusEl
+    });
     
     // Wait for cloudSync to be available
     this.waitForCloudSync();
@@ -21,22 +28,7 @@ class AuthUI {
       return;
     }
     
-    this.setupAuthListeners();
-    this.updateUI();
-  }
-
-  waitForCloudSync() {
-    // If cloud sync is disabled, skip waiting and just render
-    if (typeof FEATURES !== 'undefined' && !FEATURES.enableCloudSync) {
-      this.updateUI();
-      return;
-    }
-    
-    if (typeof cloudSync === 'undefined' || !cloudSync || !cloudSync.initialized) {
-      setTimeout(() => this.waitForCloudSync(), 100);
-      return;
-    }
-    
+    console.log('✅ [auth-ui.js] cloudSync initialized');
     this.setupAuthListeners();
     this.updateUI();
   }

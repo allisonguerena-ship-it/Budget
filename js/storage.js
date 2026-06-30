@@ -2,17 +2,22 @@ const STORAGE_KEY = "alli_pot_budget_app_v5";
 const OLD_KEYS = ["alli_pot_budget_app_v4", "alli_pot_budget_app_v3", "alli_pot_budget_app_v2"];
 
 function loadData() {
+  console.log('💾 [storage.js] loadData() called');
   let saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
   if (!saved) {
     for (const k of OLD_KEYS) {
       saved = JSON.parse(localStorage.getItem(k) || "null");
-      if (saved) break;
+      if (saved) {
+        console.log(`💾 [storage.js] Found old data in key: ${k}`);
+        break;
+      }
     }
   }
 
   const tk = monthKeyFromDate(new Date());
 
   if (!saved) {
+    console.log('💾 [storage.js] No saved data found, creating defaults');
     saved = {
       currentMonth: tk,
       income: 5708.68,
@@ -62,6 +67,13 @@ function loadData() {
     saved.months[saved.currentMonth] = { weekStarts: defaultWeekStarts(saved.currentMonth), expenses: [], finalizedWeeks: {} };
   }
 
+  console.log('✅ [storage.js] loadData() returning:', {
+    currentMonth: saved.currentMonth,
+    income: saved.income,
+    hasMonths: !!saved.months,
+    monthCount: Object.keys(saved.months || {}).length
+  });
+  
   return saved;
 }
 

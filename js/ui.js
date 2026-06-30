@@ -1,26 +1,61 @@
 function render() {
-  ensureMonth(data.currentMonth);
-  document.getElementById("income").value = data.income;
-  document.getElementById("openingPot").value = data.openingPot;
-  document.getElementById("fixedTotal").value = monthlyFixedOn(data.currentMonth + "-01").toFixed(2);
+  try {
+    console.log('📄 [ui.js] render() called');
+    console.log('📄 [ui.js] data.currentMonth:', data?.currentMonth);
+    
+    ensureMonth(data.currentMonth);
+    console.log('✅ [ui.js] ensureMonth() succeeded');
+    
+    document.getElementById("income").value = data.income;
+    document.getElementById("openingPot").value = data.openingPot;
+    document.getElementById("fixedTotal").value = monthlyFixedOn(data.currentMonth + "-01").toFixed(2);
+    console.log('✅ [ui.js] Set core inputs');
 
-  Object.entries(data.cash).forEach(([key, value]) => {
-    const element = document.getElementById(key);
-    if (element) element.value = value;
-  });
+    Object.entries(data.cash).forEach(([key, value]) => {
+      const element = document.getElementById(key);
+      if (element) element.value = value;
+    });
+    console.log('✅ [ui.js] Set cash inputs');
 
-  document.querySelectorAll("[data-lockable]").forEach(el => {
-    el.disabled = data.cash.locked;
-  });
+    document.querySelectorAll("[data-lockable]").forEach(el => {
+      el.disabled = data.cash.locked;
+    });
 
-  document.getElementById("cashLockBtn").textContent = data.cash.locked ? "Unlock cash-flow constants" : "Lock cash-flow constants";
-  document.getElementById("monthTitle").textContent = monthName(data.currentMonth);
+    document.getElementById("cashLockBtn").textContent = data.cash.locked ? "Unlock cash-flow constants" : "Lock cash-flow constants";
+    document.getElementById("monthTitle").textContent = monthName(data.currentMonth);
+    console.log('✅ [ui.js] Set titles and lock state');
 
-  renderMetrics();
-  renderFixedBills();
-  renderWeeks();
-  renderChart();
-  renderPlanner();
+    console.log('🎨 [ui.js] Calling renderMetrics()...');
+    renderMetrics();
+    console.log('✅ [ui.js] renderMetrics() done');
+    
+    console.log('🎨 [ui.js] Calling renderFixedBills()...');
+    renderFixedBills();
+    console.log('✅ [ui.js] renderFixedBills() done');
+    
+    console.log('🎨 [ui.js] Calling renderWeeks()...');
+    renderWeeks();
+    console.log('✅ [ui.js] renderWeeks() done');
+    
+    console.log('🎨 [ui.js] Calling renderChart()...');
+    renderChart();
+    console.log('✅ [ui.js] renderChart() done');
+    
+    console.log('🎨 [ui.js] Calling renderPlanner()...');
+    renderPlanner();
+    console.log('✅ [ui.js] renderPlanner() done');
+    
+    console.log('✅ [ui.js] render() completed successfully');
+  } catch (error) {
+    console.error('❌ [ui.js] FATAL ERROR in render():', error);
+    console.error('Stack trace:', error.stack);
+    document.body.innerHTML = `<pre style="padding:2rem; color:red; font-family:monospace;">
+ERROR in render():
+${error.message}
+
+${error.stack}
+    </pre>`;
+  }
 }
 
 function switchMainTab(tabName) {
@@ -180,7 +215,7 @@ function renderWeeks() {
         </details>
         <div class="expense-actions">
           <div>${frozen ? `<button class="secondary" onclick="unfinalizeWeek(${week.i})">Unfinalize week</button>` : `<button class="secondary" onclick="addExpense(${week.i})">+ Add cost</button> <button onclick="finalizeWeek(${week.i})">Finalize week</button>`}</div>
-          <span class="small">${frozen ? `Frozen on ${week.finalizedAt || 'saved date'}` : 'Finalizing adds/removes this week's leftover from POT.'}</span>
+          <span class="small">${frozen ? `Frozen on ${week.finalizedAt || 'saved date'}` : 'Finalizing adds/removes this week's leftover from POT.'}<span class="small">${frozen ? 'Frozen on ${week.finalizedAt || 'saved date'}` : `Finalizing adds/removes this week's leftover from POT.`}</span>
         </div>
       </div>`;
   }).join("");
