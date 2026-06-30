@@ -20,6 +20,8 @@ Do not remove the personal finance logic to make the app more generic.
 6. Preserve category learning/autofill.
 7. Preserve localStorage migration when changing storage keys.
 8. Keep the UI simple, clear, and non-cluttered.
+9. **Do not add unnecessary features or filters.** Keep the app focused and functional.
+10. **Prioritize multi-device sync over nice-to-have cosmetic features.**
 
 ## Weekly allowance formula
 

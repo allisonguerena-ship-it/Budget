@@ -66,7 +66,12 @@ function loadData() {
 }
 
 function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  // Save to cloud if authenticated, always to localStorage
+  if (typeof cloudSync !== 'undefined' && cloudSync && cloudSync.isAuthenticated()) {
+    cloudSync.saveData(data);
+  } else {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
 }
 
 function current() {

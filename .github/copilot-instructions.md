@@ -21,6 +21,8 @@ Before suggesting or making changes, follow the repo rules in:
 - Keep fixed bills collapsible/dropdown because there can be many rows.
 - Preserve category learning/autofill.
 - Preserve localStorage migration when changing storage keys.
+- **Do not add random features or unnecessary filters.** Keep it simple and functional.
+- **Prioritize multi-device sync support (cloud sync).**
 
 ## Editing style
 

@@ -2,8 +2,16 @@
 
 ## High priority
 
+- **[IN PROGRESS]** Add cloud sync with Firebase or Supabase (multi-device support).
+  - ✅ Cloud sync architecture designed
+  - ✅ Auth module created
+  - ✅ Supabase data client created
+  - ✅ Storage adapter (offline + cloud) created
+  - ✅ Supabase setup guide written
+  - ⏳ Integrate into existing app (add auth UI, update storage.js)
+  - ⏳ Test multi-device sync
 - Test finalized week behavior after changing fixed bills.
-- Add import from CSV backup.
+- Add import from CSV backup (complement to export).
 - Add clearer backup/restore controls.
 - Add a warning before changing fixed bills if many future weeks are open.
 - Add a compact mobile-first weekly entry mode.
@@ -12,7 +20,6 @@
 
 - Add recurring planned expenses.
 - Add paycheck-specific cash-flow view.
-- Add credit card statement balance vs payment due distinction.
 - Add category summaries by month.
 - Add spending trend chart.
 - Add ability to rename week labels.
@@ -20,10 +27,7 @@
 - Add option to archive old months.
 
 ## Nice to have
-
-- Add cloud sync with Firebase or Supabase.
 - Add login.
-- Add multi-device support.
 - Add iPhone home-screen polish.
 - Add dark mode.
 - Add custom colors.

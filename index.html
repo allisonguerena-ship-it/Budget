@@ -7,8 +7,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="POT Budget" />
   <link rel="manifest" href="manifest.json" />
-  <title>POT Budget</title>
+  <title>Squid Budget</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="css/main.css" />
   <link rel="stylesheet" href="css/layout.css" />
   <link rel="stylesheet" href="css/components.css" />
@@ -18,13 +19,36 @@
 
 </head>
 <body>
+<!-- Auth Modal -->
+<div id="authModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:8px; padding:2rem; max-width:400px; width:90%;">
+    <h2>POT Budget</h2>
+    <div id="authContent">
+      <p>Sign up or log in to sync across devices.</p>
+      <div style="margin-bottom:1rem;">
+        <input id="authEmail" type="email" placeholder="Email" style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border:1px solid #ddd; border-radius:4px;">
+        <input id="authPassword" type="password" placeholder="Password" style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border:1px solid #ddd; border-radius:4px;">
+      </div>
+      <div style="display:flex; gap:0.5rem;">
+        <button id="authSignupBtn" onclick="window.authUI.signup()" style="flex:1; padding:0.5rem; background:#4CAF50; color:white; border:none; border-radius:4px; cursor:pointer;">Sign up</button>
+        <button id="authLoginBtn" onclick="window.authUI.login()" style="flex:1; padding:0.5rem; background:#2196F3; color:white; border:none; border-radius:4px; cursor:pointer;">Log in</button>
+      </div>
+      <p id="authMessage" style="color:#d32f2f; margin-top:0.5rem; font-size:0.875rem;"></p>
+    </div>
+  </div>
+</div>
+
 <div class="wrap">
   <header>
     <div>
       <h1>POT Budget</h1>
       <div class="sub">Weekly allowance, fixed bills by effective date, finalized weeks, and a separate cash-flow planner.</div>
     </div>
-    <div class="pill">Saves automatically in this browser</div>
+    <div class="pill" id="syncStatus">Saves automatically in this browser</div>
+    <div style="margin-left:1rem;">
+      <button id="authToggleBtn" class="secondary" onclick="window.authUI.toggleAuthModal()">Sign in</button>
+      <button id="logoutBtn" class="danger" onclick="window.authUI.logout()" style="display:none;">Logout</button>
+    </div>
   </header>
 
   <div class="monthbar panel">
@@ -127,6 +151,12 @@
   </main>
 </div>
 
+  <script src="js/config.js" type="module"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/storage-adapter.js"></script>
+  <script src="js/cloud-sync.js"></script>
+  <script src="js/auth-ui.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/budget.js"></script>
