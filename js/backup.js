@@ -107,24 +107,41 @@ function importJSONBackupFromFile(file, onSuccess, onError) {
         return;
       }
       
-      // Apply migration to imported data to ensure all defaults/structure are correct
-      // The app will call loadDataWithMigration on init, but we can validate here
+      // Apply full migration to imported data to ensure all defaults/structure are correct
+      // This replicates the migration logic from storage.js loadData()
       if (!importedData.months || typeof importedData.months !== "object") {
         throw new Error("Imported data structure invalid: missing months");
       }
       
-      // Replace global data and save
-      data = importedData;
+      // Ensure all required fields with proper defaults
+      importedData.currentMonth ||= monthKeyFromDate(new Date());
+      importedData.openingPot = Number(importedData.openingPot ?? importedData.startingPot ?? 0) || 0;
+      importedData.income = Number(importedData.income ?? 5708.68) || 0;
+      importedData.fixedBills ||= [{ name: "Fixed bills legacy total", category: "Other", amount: Number(importedData.fixed) || 0, startDate: importedData.currentMonth + "-01", endDate: "", active: true }];
+      importedData.cash ||= { cashStart: 0, paycheckAmount: 2854.34, payday1: 5, payday2: 20, rentDueDay: 30, rentAmount: 3098, ccDueDay: 14, ccPaymentAmount: 0, bufferTarget: 2000, locked: true };
+      importedData.cash.locked = importedData.cash.locked !== false;
+      importedData.plannedExpenses ||= [];
+      importedData.learnedCategories ||= {};
+      importedData.months ||= {};
+      
+      // Apply defaults to each month
+      for (const [m, obj] of Object.entries(importedData.months)) {
+        obj.weekStarts ||= defaultWeekStarts(m);
+        obj.expenses ||= [];
+        obj.finalizedWeeks ||= {};
+      }
       
       // Ensure current month exists
-      if (!data.months[data.currentMonth]) {
-        data.months[data.currentMonth] = {
-          weekStarts: defaultWeekStarts(data.currentMonth),
+      if (!importedData.months[importedData.currentMonth]) {
+        importedData.months[importedData.currentMonth] = {
+          weekStarts: defaultWeekStarts(importedData.currentMonth),
           expenses: [],
           finalizedWeeks: {}
         };
       }
       
+      // Replace global data and save
+      data = importedData;
       save();
       render();
       onSuccess("✅ Data restored from backup");

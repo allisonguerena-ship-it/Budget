@@ -42,11 +42,21 @@ class StorageAdapter {
 
   /**
    * Load from localStorage only
+   * IMPORTANT: Calls loadData() to apply v2-v5 migration and defaults
+   * Never return raw localStorage data without migration
    */
   loadFromLocalStorage() {
+    // loadData() handles:
+    // - Migration from old keys (v2-v5)
+    // - Default values for all fields
+    // - Structure validation (months, weeks, etc.)
+    if (typeof loadData === 'function') {
+      return loadData();
+    }
+    
+    // Fallback if loadData not available (should not happen in normal operation)
     const STORAGE_KEY = "alli_pot_budget_app_v5";
     const OLD_KEYS = ["alli_pot_budget_app_v4", "alli_pot_budget_app_v3", "alli_pot_budget_app_v2"];
-
     let saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
     if (!saved) {
       for (const k of OLD_KEYS) {
@@ -54,7 +64,6 @@ class StorageAdapter {
         if (saved) break;
       }
     }
-
     return saved;
   }
 

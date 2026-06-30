@@ -1,3 +1,8 @@
+/**
+ * Smoke Test Logic - Validates finalized weeks stay frozen
+ * Loads core logic files and verifies that finalizing a week
+ * prevents budget recalculation even when new fixed bills are added.
+ */
 const fs = require('fs');
 const vm = require('vm');
 
