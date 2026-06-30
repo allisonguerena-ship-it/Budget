@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f3c6cf" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="POT Budget" />
+  <link rel="manifest" href="manifest.json" />
+  <title>POT Budget</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --bg:#fbf7f4; --panel:#fffaf7; --ink:#332821; --muted:#8b7567; --line:#eadbd2;
+      --pink:#f3c6cf; --rose:#d9899b; --green:#bfd8bd; --cream:#fff3df; --gold:#d9aa55;
+      --bad:#c76b6b; --good:#6b8f71; --shadow:0 18px 45px rgba(91,64,46,.12); --radius:24px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top left,rgba(243,198,207,.48),transparent 34%),radial-gradient(circle at 88% 12%,rgba(191,216,189,.45),transparent 31%),var(--bg);color:var(--ink);padding:28px}
+    .wrap{max-width:1340px;margin:auto}
+    header{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:20px}
+    h1{font-size:34px;line-height:1.05;margin:0 0 8px;font-weight:850;letter-spacing:-.04em}
+    h2{font-size:22px;margin:0 0 8px;font-weight:850;letter-spacing:-.03em}
+    .sub{color:var(--muted);font-size:15px;max-width:900px}
+    .pill{background:rgba(255,255,255,.75);border:1px solid var(--line);padding:10px 14px;border-radius:999px;color:var(--muted);font-size:13px}
+    .grid{display:grid;gap:18px}.cards{grid-template-columns:repeat(4,1fr)}.top{grid-template-columns:1.05fr .95fr}.plannergrid{grid-template-columns:1fr 1fr}
+    .panel,.section-card{background:rgba(255,250,247,.9);border:1px solid rgba(234,219,210,.95);box-shadow:var(--shadow);border-radius:var(--radius);padding:20px;backdrop-filter:blur(10px)}
+    .section-card{margin-top:18px}
+    details.section-card{padding:0;overflow:hidden}
+    details.section-card>summary{list-style:none;cursor:pointer;padding:20px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+    details.section-card>summary::-webkit-details-marker{display:none}
+    details.section-card .inside{padding:0 20px 20px}
+    .chev{font-size:13px;color:var(--muted);font-weight:800}
+    .metric{min-height:112px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(255,243,223,.78))}
+    .metric.leftover{background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(191,216,189,.7))}
+    .metric.spent{background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(243,198,207,.65))}
+    .metric.pot{background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(217,170,85,.20))}
+    .label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:780}
+    .value{font-size:30px;font-weight:875;letter-spacing:-.04em}.small{font-size:13px;color:var(--muted)}
+    label{font-size:12px;color:var(--muted);font-weight:760;text-transform:uppercase;letter-spacing:.07em}
+    input,select{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:11px 12px;color:var(--ink);font-size:14px;outline:none}
+    input:disabled,select:disabled{background:#f7efe9;color:#8b7567}
+    input:focus,select:focus{border-color:var(--rose);box-shadow:0 0 0 4px rgba(217,137,155,.14)}
+    button{border:0;border-radius:14px;padding:11px 14px;background:var(--ink);color:white;font-weight:850;cursor:pointer}
+    button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}
+    button.danger{background:#fff;color:var(--bad);border:1px solid rgba(199,107,107,.32)}
+    button.tiny{padding:7px 9px;border-radius:11px;font-size:12px}
+    .settings{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.cashsettings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+    .toolbar,.monthbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}.monthbar{justify-content:space-between;margin-bottom:18px}
+    .month-title{font-size:22px;font-weight:850;letter-spacing:-.03em}
+    .weeks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}
+    .week{background:#fff;border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:0 10px 26px rgba(91,64,46,.08)}
+    .week.finalized{border-color:rgba(107,143,113,.55);background:#fffdfa}
+    .week-head{padding:16px 18px;background:linear-gradient(135deg,rgba(243,198,207,.48),rgba(191,216,189,.32));border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+    .week-title{font-weight:860;font-size:18px}.badge{padding:7px 10px;border-radius:999px;font-size:12px;font-weight:850;background:#fff;border:1px solid var(--line);white-space:nowrap}
+    .badge.good{color:var(--good)}.badge.bad{color:var(--bad)}.badge.warn{color:#a36f20}
+    .week-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:14px 18px;border-bottom:1px solid var(--line);background:#fffaf7}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px}.stat .num{font-weight:875;font-size:16px;margin-top:2px}.stat.potmini{opacity:.78}
+    table{width:100%;border-collapse:collapse}th,td{padding:9px 8px;border-bottom:1px solid #f0e4dd;text-align:left;font-size:13px;vertical-align:middle}
+    th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07em;background:#fffaf7}
+    td input,td select{padding:8px 9px;border-radius:10px;font-size:13px}.table-wrap{padding:0 10px;overflow-x:auto}.wide-table input,.wide-table select{min-width:120px}.wide-table .nameinput{min-width:190px}
+    .expense-actions{display:flex;gap:8px;padding:14px 18px;align-items:center;justify-content:space-between}.chartbox{height:260px}
+    .note{background:rgba(255,243,223,.85);border:1px dashed rgba(217,170,85,.7);border-radius:18px;padding:14px;color:#6f5747;font-size:13px;line-height:1.45;margin-top:14px}
+    .timeline{display:flex;flex-direction:column;gap:10px;margin-top:12px}.event{display:grid;grid-template-columns:92px 1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px}
+    .event .date{font-weight:850}.event.pay{border-left:8px solid var(--green)}.event.bill{border-left:8px solid var(--pink)}.event.plan{border-left:8px solid var(--gold)}
+    .impact{font-weight:850;white-space:nowrap}.positive{color:var(--good)}.negative{color:var(--bad)}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.tab{background:#fff;color:var(--ink);border:1px solid var(--line)}.tab.active{background:var(--ink);color:white}.hidden{display:none}
+    @media(max-width:1050px){body{padding:16px}header,.top{display:block}.cards,.settings,.cashsettings,.weeks,.plannergrid{grid-template-columns:1fr}.panel{margin-bottom:16px}.week-stats{grid-template-columns:repeat(2,1fr)}.event{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>POT Budget</h1>
+      <div class="sub">Weekly allowance, fixed bills by effective date, finalized weeks, and a separate cash-flow planner.</div>
+    </div>
+    <div class="pill">Saves automatically in this browser</div>
+  </header>
+
+  <div class="monthbar panel">
+    <div>
+      <div class="label">Viewing</div>
+      <div class="month-title" id="monthTitle"></div>
+      <div class="small">Weeks are always 7 days. The month view is just for history/navigation.</div>
+    </div>
+    <div class="toolbar" style="margin:0">
+      <button class="secondary" onclick="prevMonth()">← Previous</button>
+      <button class="secondary" onclick="nextMonth()">Next →</button>
+      <button onclick="addMonth()">+ Add new month</button>
+    </div>
+  </div>
+
+  <section class="grid cards" id="metricCards"></section>
+
+  <section class="grid top" style="margin-top:18px">
+    <div class="panel">
+      <div class="label">Core budget settings</div>
+      <div class="settings">
+        <div><label>Monthly take-home income</label><input id="income" type="number" step="0.01"></div>
+        <div><label>Opening POT</label><input id="openingPot" type="number" step="0.01"></div>
+        <div><label>Monthly fixed bills</label><input id="fixedTotal" type="number" step="0.01" disabled></div>
+      </div>
+      <div class="toolbar">
+        <button onclick="saveCoreSettings()">Update core budget</button>
+        <button class="secondary" onclick="addWeek()">+ Add next 7-day week</button>
+        <button class="secondary" onclick="downloadCSV()">Export CSV backup</button>
+        <button class="danger" onclick="resetData()">Reset</button>
+      </div>
+      <div class="note"><b>Allowance formula:</b> weekly allowance = (monthly income − fixed bills active for that week) × 12 ÷ 365 × 7. This avoids fake 4-week/5-week month math.</div>
+    </div>
+    <div class="panel">
+      <div class="label">Allowance vs spent</div>
+      <div class="chartbox"><canvas id="spendChart"></canvas></div>
+    </div>
+  </section>
+
+  <details class="section-card">
+    <summary>
+      <div><h2>Fixed bills / recurring costs</h2><div class="sub">Hidden by default because there can be a lot of rows. These are the key inputs that calculate allowance.</div></div>
+      <div class="chev">Open / close</div>
+    </summary>
+    <div class="inside">
+      <div class="toolbar"><button class="secondary" onclick="addFixedBill()">+ Add fixed bill</button></div>
+      <div class="table-wrap wide-table">
+        <table>
+          <thead><tr><th>Name</th><th>Category</th><th>Monthly amount</th><th>Starts</th><th>Ends after</th><th>Active?</th><th></th></tr></thead>
+          <tbody id="fixedBillRows"></tbody>
+        </table>
+      </div>
+      <div class="note">When you change or cancel something, use the start/end dates. The app applies it only to weeks on or after those dates. Finalized weeks stay frozen unless you unfinalize them.</div>
+    </div>
+  </details>
+
+  <div class="tabs">
+    <button id="budgetTab" class="tab active" onclick="showView('budget')">Weekly budget</button>
+    <button id="cashTab" class="tab" onclick="showView('cash')">Cash-flow planner</button>
+  </div>
+
+  <main id="budgetView">
+    <section class="weeks" id="weeks"></section>
+  </main>
+
+  <main id="cashView" class="hidden">
+    <section class="section-card">
+      <h2>Cash-flow planner</h2>
+      <div class="sub">This is separate from weekly allowance. It is for actual timing: paychecks, rent, card due dates, and planned expenses.</div>
+      <div class="toolbar">
+        <button id="cashLockBtn" class="secondary" onclick="toggleCashLock()">Unlock cash-flow constants</button>
+        <button onclick="saveCashSettings()">Update cash flow</button>
+      </div>
+      <div class="cashsettings">
+        <div><label>Manual starting cash</label><input id="cashStart" type="number" step="0.01"></div>
+        <div><label>Paycheck amount</label><input id="paycheckAmount" type="number" step="0.01" data-lockable></div>
+        <div><label>Payday 1</label><input id="payday1" type="number" min="1" max="31" data-lockable></div>
+        <div><label>Payday 2</label><input id="payday2" type="number" min="1" max="31" data-lockable></div>
+        <div><label>Rent due day</label><input id="rentDueDay" type="number" min="1" max="31" data-lockable></div>
+        <div><label>Rent amount</label><input id="rentAmount" type="number" step="0.01" data-lockable></div>
+        <div><label>Credit card due</label><input id="ccDueDay" type="number" min="1" max="31" data-lockable></div>
+        <div><label>Credit card payment</label><input id="ccPaymentAmount" type="number" step="0.01"></div>
+        <div><label>Safety buffer target</label><input id="bufferTarget" type="number" step="0.01"></div>
+      </div>
+      <div class="note">I kept a manual starting cash field because a browser app cannot see your bank balance. The cash-flow projection only becomes accurate when you enter the cash you want it to start from. POT is not preloaded here.</div>
+      <div class="grid plannergrid" style="margin-top:18px">
+        <div>
+          <div class="toolbar"><button class="secondary" onclick="addPlannedExpense()">+ Add planned expense</button></div>
+          <div class="table-wrap">
+            <table><thead><tr><th>Date</th><th>Thing</th><th>Type</th><th>Amount</th><th>Paid?</th><th></th></tr></thead><tbody id="plannedRows"></tbody></table>
+          </div>
+        </div>
+        <div>
+          <div class="label">Money timeline</div>
+          <div id="cashInsight" class="note"></div>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const STORAGE_KEY = "alli_pot_budget_app_v5";
+const OLD_KEYS = ["alli_pot_budget_app_v4","alli_pot_budget_app_v3","alli_pot_budget_app_v2"];
+const fmt = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"});
+const cats = ["Food","Coffee","Groceries","Shopping","Beauty","Dog","Going Out","Uber/Waymo","Subscription","Home","Health","Trip/Travel","Other"];
+const billCats = ["Housing","Car","Insurance","Utilities","Phone","Subscription","Dog","Health","Debt","Other"];
+const planTypes = ["Trip/Travel","Moving","Gift","Annual Bill","Medical","Beauty","Home","Other"];
+
+function monthKeyFromDate(date){ return date.toISOString().slice(0,7); }
+function firstOfMonth(key){ return new Date(key + "-01T00:00:00"); }
+function addMonthsToKey(key,n){ const d=firstOfMonth(key); d.setMonth(d.getMonth()+n); return monthKeyFromDate(d); }
+function monthName(key){ return firstOfMonth(key).toLocaleDateString("en-US",{month:"long",year:"numeric"}); }
+function addDays(iso,days){ const d=new Date(iso+"T00:00:00"); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
+function shortDate(iso){ const d=new Date(iso+"T00:00:00"); return d.toLocaleDateString("en-US",{month:"short",day:"numeric"}); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function defaultWeekStarts(key){ const start=firstOfMonth(key); const starts=[]; let d=new Date(start); while(d.getMonth()===start.getMonth()){ starts.push(d.toISOString().slice(0,10)); d.setDate(d.getDate()+7); } return starts; }
+
+function loadData(){
+  let saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+  if(!saved){
+    for(const k of OLD_KEYS){
+      saved = JSON.parse(localStorage.getItem(k) || "null");
+      if(saved) break;
+    }
+  }
+  const tk = monthKeyFromDate(new Date());
+  if(!saved){
+    saved = {
+      currentMonth: tk,
+      income: 5708.68,
+      openingPot: 0,
+      learnedCategories: {"trader joes":"Groceries","trader joes market":"Groceries"},
+      fixedBills: [
+        {name:"Rent", category:"Housing", amount:3098, startDate:tk+"-01", endDate:"", active:true},
+        {name:"Parking", category:"Housing", amount:125, startDate:tk+"-01", endDate:"", active:true},
+        {name:"Pet rent", category:"Dog", amount:35, startDate:tk+"-01", endDate:"", active:true},
+        {name:"Car payment", category:"Car", amount:0, startDate:tk+"-01", endDate:"", active:true},
+        {name:"Subscriptions", category:"Subscription", amount:0, startDate:tk+"-01", endDate:"", active:true}
+      ],
+      cash:{cashStart:25000,paycheckAmount:2854.34,payday1:5,payday2:20,rentDueDay:30,rentAmount:3098,ccDueDay:14,ccPaymentAmount:2500,bufferTarget:2000,locked:true},
+      plannedExpenses:[{date:tk+"-15",desc:"Sister bachelorette trip flights",type:"Trip/Travel",amount:0,paid:false}],
+      months:{}
+    };
+  }
+  saved.currentMonth ||= tk;
+  saved.openingPot = Number(saved.openingPot ?? saved.startingPot ?? 0) || 0;
+  saved.income = Number(saved.income ?? 5708.68) || 0;
+  saved.fixedBills ||= [{name:"Fixed bills legacy total",category:"Other",amount:Number(saved.fixed)||0,startDate:saved.currentMonth+"-01",endDate:"",active:true}];
+  saved.cash ||= {cashStart:0,paycheckAmount:2854.34,payday1:5,payday2:20,rentDueDay:30,rentAmount:3098,ccDueDay:14,ccPaymentAmount:0,bufferTarget:2000,locked:true};
+  saved.cash.locked = saved.cash.locked !== false;
+  saved.plannedExpenses ||= [];
+  saved.learnedCategories ||= {};
+  saved.months ||= {};
+  for(const [m, obj] of Object.entries(saved.months)){
+    obj.weekStarts ||= defaultWeekStarts(m);
+    obj.expenses ||= [];
+    obj.finalizedWeeks ||= {};
+  }
+  if(!saved.months[saved.currentMonth]) saved.months[saved.currentMonth] = {weekStarts: defaultWeekStarts(saved.currentMonth), expenses: [], finalizedWeeks:{}};
+  return saved;
+}
+let data = loadData();
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function current(){ return data.months[data.currentMonth]; }
+function ensureMonth(key){ if(!data.months[key]) data.months[key]={weekStarts:defaultWeekStarts(key),expenses:[],finalizedWeeks:{}}; data.months[key].finalizedWeeks ||= {}; }
+function activeFixedBillsOn(date){
+  return (data.fixedBills||[]).filter(b=>{
+    if(b.active === false) return false;
+    const start = b.startDate || "1900-01-01";
+    const end = b.endDate || "9999-12-31";
+    return start <= date && date <= end;
+  });
+}
+function monthlyFixedOn(date){ return activeFixedBillsOn(date).reduce((s,b)=>s+(Number(b.amount)||0),0); }
+function weeklyAllowance(date){ return ((Number(data.income)||0) - monthlyFixedOn(date)) * 12 / 365 * 7; }
+function weekExpenses(i){ return current().expenses.filter(e => Number(e.week) === i); }
+function spent(i){ return weekExpenses(i).reduce((s,e)=>s+(Number(e.amount)||0),0); }
+function normalizeDesc(desc){ return String(desc||"").toLowerCase().trim().replace(/[’']/g,"").replace(/[^a-z0-9 ]/g,"").replace(/\s+/g," ").slice(0,40); }
+
+function getPriorFinalizedPot(monthKey, beforeDate){
+  let bestDate = "", pot = Number(data.openingPot)||0;
+  for(const [mk,m] of Object.entries(data.months)){
+    for(const [idx, f] of Object.entries(m.finalizedWeeks || {})){
+      const date = f.date || (m.weekStarts||[])[Number(idx)];
+      if(date && date < beforeDate && date > bestDate){ bestDate = date; pot = Number(f.endingPot)||0; }
+    }
+  }
+  return pot;
+}
+function calcWeeks(){
+  const m = current();
+  const arr = [];
+  let runningPot = getPriorFinalizedPot(data.currentMonth, m.weekStarts[0] || data.currentMonth+"-01");
+  m.weekStarts.forEach((date,i)=>{
+    const f = m.finalizedWeeks?.[i];
+    if(f){
+      arr.push({...f, i, finalized:true});
+      runningPot = Number(f.endingPot)||0;
+    } else {
+      const allowance = weeklyAllowance(date);
+      const used = spent(i);
+      const leftover = allowance - used;
+      const endingPot = runningPot + leftover;
+      arr.push({i,date,startPot:runningPot,allowance,used,leftover,endingPot,fixed:monthlyFixedOn(date),finalized:false});
+      runningPot = endingPot;
+    }
+  });
+  return arr;
+}
+function finalizeWeek(i){
+  const w = calcWeeks().find(x=>x.i===i);
+  if(!w) return;
+  current().finalizedWeeks[i] = {
+    date:w.date, startPot:w.startPot, allowance:w.allowance, used:w.used, leftover:w.leftover,
+    endingPot:w.endingPot, fixed:w.fixed, finalizedAt:todayISO()
+  };
+  save(); render();
+}
+function unfinalizeWeek(i){
+  delete current().finalizedWeeks[i];
+  save(); render();
+}
+
+function prevMonth(){ data.currentMonth=addMonthsToKey(data.currentMonth,-1); ensureMonth(data.currentMonth); save(); render(); }
+function nextMonth(){ data.currentMonth=addMonthsToKey(data.currentMonth,1); ensureMonth(data.currentMonth); save(); render(); }
+function addMonth(){ const keys=Object.keys(data.months).sort(); const next=addMonthsToKey(keys[keys.length-1]||data.currentMonth,1); ensureMonth(next); data.currentMonth=next; save(); render(); }
+function addWeek(){ const m=current(); const last=m.weekStarts[m.weekStarts.length-1] || data.currentMonth+"-01"; m.weekStarts.push(addDays(last,7)); save(); render(); }
+function saveCoreSettings(){ data.income=Number(document.getElementById("income").value)||0; data.openingPot=Number(document.getElementById("openingPot").value)||0; save(); render(); }
+
+function addFixedBill(){ data.fixedBills.push({name:"",category:"Subscription",amount:0,startDate:todayISO(),endDate:"",active:true}); save(); render(); }
+function updateFixedBill(i,field,value){ const b=data.fixedBills[i]; if(!b)return; if(field==="amount")value=Number(value)||0; if(field==="active")value=!!value; b[field]=value; save(); render(); }
+function deleteFixedBill(i){ data.fixedBills.splice(i,1); save(); render(); }
+
+function addExpense(week){ current().expenses.push({week,date:current().weekStarts[week],desc:"",category:"Other",amount:0}); save(); render(); }
+function learnFromExpense(e){ const key=normalizeDesc(e.desc); if(key&&e.category)data.learnedCategories[key]=e.category; }
+function guessCategory(desc){ const typed=normalizeDesc(desc); if(!typed)return null; let best=null; for(const [k,v] of Object.entries(data.learnedCategories||{})){const kk=normalizeDesc(k); if(typed.includes(kk)||kk.includes(typed)){if(!best||kk.length>best.k.length)best={k:kk,v};}} return best?.v||null; }
+function updateExpense(globalIndex, field, value){ const e=current().expenses[globalIndex]; if(!e)return; if(field==="amount")value=Number(value)||0; e[field]=value; if(field==="desc"){const guessed=guessCategory(value); if(guessed)e.category=guessed;} if(field==="category"||field==="desc")learnFromExpense(e); save(); render(); }
+function deleteExpense(globalIndex){ current().expenses.splice(globalIndex,1); save(); render(); }
+
+function showView(view){
+  document.getElementById("budgetView").classList.toggle("hidden", view!=="budget");
+  document.getElementById("cashView").classList.toggle("hidden", view!=="cash");
+  document.getElementById("budgetTab").classList.toggle("active", view==="budget");
+  document.getElementById("cashTab").classList.toggle("active", view==="cash");
+}
+function toggleCashLock(){ data.cash.locked = !data.cash.locked; save(); render(); }
+function saveCashSettings(){ ["cashStart","paycheckAmount","payday1","payday2","rentDueDay","rentAmount","ccDueDay","ccPaymentAmount","bufferTarget"].forEach(id=>data.cash[id]=Number(document.getElementById(id).value)||0); save(); render(); }
+function addPlannedExpense(){ data.plannedExpenses.push({date:data.currentMonth+"-15",desc:"",type:"Trip/Travel",amount:0,paid:false}); save(); render(); }
+function updatePlanned(i,field,value){ const p=data.plannedExpenses[i]; if(!p)return; if(field==="amount")value=Number(value)||0; if(field==="paid")value=!!value; p[field]=value; save(); render(); }
+function deletePlanned(i){ data.plannedExpenses.splice(i,1); save(); render(); }
+function resetData(){ if(confirm("Reset everything? Export CSV first if you want a backup.")){ localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+
+function daysInMonth(key){ const d=firstOfMonth(key); return new Date(d.getFullYear(), d.getMonth()+1, 0).getDate(); }
+function dateForDay(key, day){ const d=firstOfMonth(key); d.setDate(Math.min(Math.max(1,Number(day)||1),daysInMonth(key))); return d.toISOString().slice(0,10); }
+function monthPlanned(){ return data.plannedExpenses.filter(p => String(p.date||"").slice(0,7)===data.currentMonth); }
+function cashEvents(){
+  const c=data.cash, events=[];
+  events.push({date:dateForDay(data.currentMonth,c.payday1), desc:"Paycheck", type:"pay", amount:Number(c.paycheckAmount)||0});
+  events.push({date:dateForDay(data.currentMonth,c.payday2), desc:"Paycheck", type:"pay", amount:Number(c.paycheckAmount)||0});
+  events.push({date:dateForDay(data.currentMonth,c.rentDueDay), desc:"Rent due", type:"bill", amount:-(Number(c.rentAmount)||0)});
+  events.push({date:dateForDay(data.currentMonth,c.ccDueDay), desc:"Credit card due", type:"bill", amount:-(Number(c.ccPaymentAmount)||0)});
+  monthPlanned().filter(p=>!p.paid).forEach(p=>events.push({date:p.date, desc:p.desc||"Planned expense", type:"plan", amount:-(Number(p.amount)||0)}));
+  return events.sort((a,b)=>a.date.localeCompare(b.date));
+}
+function cashProjection(){
+  let bal=Number(data.cash.cashStart)||0, low=bal;
+  const events=cashEvents().map(e=>{bal+=e.amount; low=Math.min(low,bal); return {...e,balance:bal};});
+  return {events,ending:bal,low};
+}
+
+function render(){
+  ensureMonth(data.currentMonth);
+  document.getElementById("income").value=data.income;
+  document.getElementById("openingPot").value=data.openingPot;
+  document.getElementById("fixedTotal").value=monthlyFixedOn(data.currentMonth+"-01").toFixed(2);
+  Object.entries(data.cash).forEach(([k,v])=>{const el=document.getElementById(k); if(el)el.value=v;});
+  document.querySelectorAll("[data-lockable]").forEach(el=>el.disabled=data.cash.locked);
+  document.getElementById("cashLockBtn").textContent = data.cash.locked ? "Unlock cash-flow constants" : "Lock cash-flow constants";
+  document.getElementById("monthTitle").textContent=monthName(data.currentMonth);
+  renderMetrics(); renderFixedBills(); renderWeeks(); renderChart(); renderPlanner();
+}
+function renderMetrics(){
+  const weeks=calcWeeks(), activeFixed=monthlyFixedOn(data.currentMonth+"-01"), activeAllowance=weeklyAllowance(data.currentMonth+"-01");
+  const totalSpent=weeks.reduce((s,w)=>s+(Number(w.used)||0),0);
+  const totalLeft=weeks.reduce((s,w)=>s+(Number(w.leftover)||0),0);
+  const finalPot=weeks[weeks.length-1]?.endingPot ?? data.openingPot;
+  document.getElementById("metricCards").innerHTML=`
+    <div class="panel metric"><div class="label">Current weekly allowance</div><div class="value">${fmt.format(activeAllowance)}</div><div class="small">${fmt.format(activeFixed)} fixed bills active</div></div>
+    <div class="panel metric spent"><div class="label">Spent in view</div><div class="value">${fmt.format(totalSpent)}</div><div class="small">Entered weekly costs</div></div>
+    <div class="panel metric leftover"><div class="label">Left over in view</div><div class="value">${fmt.format(totalLeft)}</div><div class="small">Allowance minus spent</div></div>
+    <div class="panel metric pot"><div class="label">Projected POT</div><div class="value">${fmt.format(finalPot)}</div><div class="small">Finalized weeks stay frozen</div></div>`;
+}
+function renderFixedBills(){
+  const rows=(data.fixedBills||[]).map((b,i)=>`
+    <tr>
+      <td><input class="nameinput" value="${escapeHtml(b.name||"")}" placeholder="ex: Car payment" onchange="updateFixedBill(${i},'name',this.value)"></td>
+      <td><select onchange="updateFixedBill(${i},'category',this.value)">${billCats.map(c=>`<option ${b.category===c?'selected':''}>${c}</option>`).join("")}</select></td>
+      <td><input type="number" step="0.01" value="${Number(b.amount)||0}" onchange="updateFixedBill(${i},'amount',this.value)"></td>
+      <td><input type="date" value="${b.startDate||todayISO()}" onchange="updateFixedBill(${i},'startDate',this.value)"></td>
+      <td><input type="date" value="${b.endDate||''}" onchange="updateFixedBill(${i},'endDate',this.value)"></td>
+      <td><input type="checkbox" ${b.active!==false?'checked':''} onchange="updateFixedBill(${i},'active',this.checked)"></td>
+      <td><button class="danger tiny" onclick="deleteFixedBill(${i})">×</button></td>
+    </tr>`).join("");
+  document.getElementById("fixedBillRows").innerHTML=rows || `<tr><td colspan="7" class="small">No fixed bills yet.</td></tr>`;
+}
+function renderWeeks(){
+  const weeks=calcWeeks();
+  document.getElementById("weeks").innerHTML=weeks.map(w=>{
+    const frozen = w.finalized;
+    const rows=weekExpenses(w.i).map(e=>{const idx=current().expenses.indexOf(e);return `<tr>
+      <td><input type="date" value="${e.date||w.date}" ${frozen?'disabled':''} onchange="updateExpense(${idx},'date',this.value)"></td>
+      <td><input value="${escapeHtml(e.desc||"")}" placeholder="ex: Trader Joe's" ${frozen?'disabled':''} onchange="updateExpense(${idx},'desc',this.value)" onblur="updateExpense(${idx},'desc',this.value)"></td>
+      <td><select ${frozen?'disabled':''} onchange="updateExpense(${idx},'category',this.value)">${cats.map(c=>`<option ${e.category===c?'selected':''}>${c}</option>`).join("")}</select></td>
+      <td><input type="number" step="0.01" value="${Number(e.amount)||0}" ${frozen?'disabled':''} onchange="updateExpense(${idx},'amount',this.value)"></td>
+      <td>${frozen?'<span class="small">locked</span>':`<button class="danger tiny" onclick="deleteExpense(${idx})">×</button>`}</td>
+    </tr>`}).join("");
+    const ok=w.leftover>=0;
+    return `<div class="week ${frozen?'finalized':''}">
+      <div class="week-head">
+        <div><div class="week-title">Week ${w.i+1}: ${shortDate(w.date)} – ${shortDate(addDays(w.date,6))}</div><div class="small">${frozen ? "Finalized/frozen. Past math will not rewrite." : "Finalize at week end to lock allowance, spending, left over, and POT."}</div></div>
+        <div class="badge ${frozen?'warn':(ok?'good':'bad')}">${frozen?'Finalized':(ok?`${fmt.format(w.leftover)} left`:`${fmt.format(Math.abs(w.leftover))} over`)}</div>
+      </div>
+      <div class="week-stats">
+        <div class="stat"><div class="label">Fixed bills used</div><div class="num">${fmt.format(w.fixed)}</div></div>
+        <div class="stat"><div class="label">Allowance</div><div class="num">${fmt.format(w.allowance)}</div></div>
+        <div class="stat"><div class="label">Spent</div><div class="num">${fmt.format(w.used)}</div></div>
+        <div class="stat"><div class="label">Left over</div><div class="num">${fmt.format(w.leftover)}</div></div>
+        <div class="stat potmini"><div class="label">POT after week</div><div class="num">${fmt.format(w.endingPot)}</div></div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cost / Purchase</th><th>Category</th><th>Amount</th><th></th></tr></thead><tbody>${rows || `<tr><td colspan="5" class="small" style="padding:16px">No costs entered yet.</td></tr>`}</tbody></table></div>
+      <div class="expense-actions">
+        <div>${frozen ? `<button class="secondary" onclick="unfinalizeWeek(${w.i})">Unfinalize week</button>` : `<button class="secondary" onclick="addExpense(${w.i})">+ Add cost</button> <button onclick="finalizeWeek(${w.i})">Finalize week</button>`}</div>
+        <span class="small">${frozen ? `Frozen on ${w.finalizedAt || "saved date"}` : "Finalizing adds/removes this week’s leftover from POT."}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+function renderPlanner(){
+  document.getElementById("plannedRows").innerHTML=(data.plannedExpenses||[]).map((p,i)=>`
+    <tr>
+      <td><input type="date" value="${p.date||data.currentMonth+'-15'}" onchange="updatePlanned(${i},'date',this.value)"></td>
+      <td><input value="${escapeHtml(p.desc||"")}" placeholder="ex: Bachelorette flights" onchange="updatePlanned(${i},'desc',this.value)"></td>
+      <td><select onchange="updatePlanned(${i},'type',this.value)">${planTypes.map(t=>`<option ${p.type===t?'selected':''}>${t}</option>`).join("")}</select></td>
+      <td><input type="number" step="0.01" value="${Number(p.amount)||0}" onchange="updatePlanned(${i},'amount',this.value)"></td>
+      <td><input type="checkbox" ${p.paid?'checked':''} onchange="updatePlanned(${i},'paid',this.checked)"></td>
+      <td><button class="danger tiny" onclick="deletePlanned(${i})">×</button></td>
+    </tr>`).join("") || `<tr><td colspan="6" class="small">No planned expenses yet.</td></tr>`;
+  const proj=cashProjection(), buffer=Number(data.cash.bufferTarget)||0;
+  document.getElementById("cashInsight").innerHTML = Number(data.cash.cashStart) === 0
+    ? `<b>Manual starting cash is $0.</b> Enter the amount of cash you want the cash-flow planner to start from, otherwise the timeline will look wrong.`
+    : (proj.low < buffer ? `<b>Heads up:</b> lowest projected cash is ${fmt.format(proj.low)}, below your ${fmt.format(buffer)} buffer.` : `<b>Looks okay:</b> lowest projected cash is ${fmt.format(proj.low)}, above your ${fmt.format(buffer)} buffer.`);
+  document.getElementById("timeline").innerHTML=proj.events.map(e=>`
+    <div class="event ${e.type}">
+      <div class="date">${shortDate(e.date)}</div>
+      <div><b>${escapeHtml(e.desc)}</b><br><span class="small">Projected balance after: ${fmt.format(e.balance)}</span></div>
+      <div class="impact ${e.amount>=0?'positive':'negative'}">${e.amount>=0?'+':'-'}${fmt.format(Math.abs(e.amount))}</div>
+    </div>`).join("");
+}
+let chart;
+function renderChart(){
+  const weeks=calcWeeks(), ctx=document.getElementById("spendChart");
+  if(chart)chart.destroy();
+  chart=new Chart(ctx,{type:"bar",data:{labels:weeks.map(w=>"W"+(w.i+1)),datasets:[{label:"Spent",data:weeks.map(w=>w.used)},{label:"Left over",data:weeks.map(w=>w.leftover)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},scales:{y:{ticks:{callback:v=>"$"+v}}}}});
+}
+function downloadCSV(){
+  const rows=[["Month","Section","Week","Week Starting","Date","Description","Category/Type","Amount","Status"]];
+  Object.entries(data.months).forEach(([month,m])=>{(m.expenses||[]).forEach(e=>rows.push([month,"Weekly",Number(e.week)+1,m.weekStarts[Number(e.week)],e.date,e.desc,e.category,e.amount,m.finalizedWeeks?.[e.week]?"Finalized":"Open"]));});
+  (data.fixedBills||[]).forEach(b=>rows.push(["","Fixed Bill","","",b.startDate,b.name,b.category,b.amount,b.endDate?("Ends "+b.endDate):"Active"]));
+  (data.plannedExpenses||[]).forEach(p=>rows.push([String(p.date).slice(0,7),"Planned","","",p.date,p.desc,p.type,p.amount,p.paid?"Paid":"Outstanding"]));
+  const csv=rows.map(r=>r.map(x=>`"${String(x??"").replaceAll('"','""')}"`).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="pot-budget-export.csv"; a.click(); URL.revokeObjectURL(url);
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));}
+render();
+</script>
+</body>
+</html>

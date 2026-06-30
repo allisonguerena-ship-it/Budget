@@ -1,0 +1,16 @@
+{
+  "name": "POT Budget",
+  "short_name": "POT Budget",
+  "description": "Weekly budget with fixed bills, finalized weeks, and cash-flow planning.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fbf7f4",
+  "theme_color": "#f3c6cf",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
