@@ -23,28 +23,87 @@ function render() {
   renderPlanner();
 }
 
+function switchMainTab(tabName) {
+  // Hide all tabs
+  document.getElementById('overviewTab').classList.add('hidden');
+  document.getElementById('detailedTab').classList.add('hidden');
+  document.getElementById('weeklyTab').classList.add('hidden');
+  
+  // Remove active class from all buttons
+  document.getElementById('overviewTabBtn').classList.remove('active');
+  document.getElementById('detailedTabBtn').classList.remove('active');
+  document.getElementById('weeklyTabBtn').classList.remove('active');
+  
+  // Show selected tab and mark button active
+  if (tabName === 'overview') {
+    document.getElementById('overviewTab').classList.remove('hidden');
+    document.getElementById('overviewTabBtn').classList.add('active');
+  } else if (tabName === 'detailed') {
+    document.getElementById('detailedTab').classList.remove('hidden');
+    document.getElementById('detailedTabBtn').classList.add('active');
+  } else if (tabName === 'weekly') {
+    document.getElementById('weeklyTab').classList.remove('hidden');
+    document.getElementById('weeklyTabBtn').classList.add('active');
+    // Auto-scroll to current week when switching to weekly tab
+    setTimeout(() => scrollToCurrentWeek(), 100);
+  }
+}
+
+function scrollToCurrentWeek() {
+  const activeWeek = document.querySelector('.week.active');
+  if (activeWeek) {
+    activeWeek.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
 function renderMetrics() {
   const weeks = calcWeeks();
-  const activeFixed = monthlyFixedOn(data.currentMonth + "-01");
-  const activeAllowance = weeklyAllowance(data.currentMonth + "-01");
-  const totalSpent = weeks.reduce((sum, week) => sum + (Number(week.used) || 0), 0);
-  const totalLeft = weeks.reduce((sum, week) => sum + (Number(week.leftover) || 0), 0);
+  const currentMonth = data.currentMonth;
+  const lastDayOfMonth = new Date(currentMonth.split('-')[0], currentMonth.split('-')[1], 0).getDate();
+  const today = new Date();
+  const daysInMonth = lastDayOfMonth;
+  const dayOfMonth = today.getDate();
+  const daysRemaining = lastDayOfMonth - dayOfMonth + 1;
+  const percentComplete = Math.round((dayOfMonth / daysInMonth) * 100);
+  
+  // Get POT
+  const finalPot = weeks[weeks.length - 1]?.endingPot ?? data.openingPot;
+  
+  // Spent in unfinalized weeks only
+  const unfinWeeks = weeks.filter(w => !w.finalized);
+  const totalSpentUnfin = unfinWeeks.reduce((sum, week) => sum + (Number(week.used) || 0), 0);
+  
+  // Available in unfinalized weeks
+  const totalAvailableUnfin = unfinWeeks.reduce((sum, week) => sum + (Number(week.leftover) || 0), 0);
+  
+  // CC projection: unfin week spending only (simple version)
+  const ccProjection = totalSpentUnfin;
 
   document.getElementById("metricCards").innerHTML = `
     <div class="panel metric">
-      <div class="label">Current weekly allowance</div>
-      <div class="value">${fmt.format(activeAllowance)}</div>
-      <div class="small">${fmt.format(activeFixed)} fixed bills active</div>
+      <div class="label">📊 ${monthName(currentMonth)}</div>
+      <div class="value">${daysRemaining > 0 ? daysRemaining : '0'} days</div>
+      <div class="small">${percentComplete}% of month complete</div>
+    </div>
+    <div class="panel metric">
+      <div class="label">💰 POT Balance</div>
+      <div class="value">${fmt.format(finalPot)}</div>
+      <div class="small">Accumulated buffer</div>
     </div>
     <div class="panel metric spent">
-      <div class="label">Spent in view</div>
-      <div class="value">${fmt.format(totalSpent)}</div>
-      <div class="small">Entered weekly costs</div>
+      <div class="label">💸 Spent (unfin)</div>
+      <div class="value">${fmt.format(totalSpentUnfin)}</div>
+      <div class="small">Current month spending</div>
     </div>
     <div class="panel metric leftover">
-      <div class="label">Leftover</div>
-      <div class="value">${fmt.format(totalLeft)}</div>
-      <div class="small">Allowance minus spent</div>
+      <div class="label">✅ Available (unfin)</div>
+      <div class="value">${fmt.format(totalAvailableUnfin)}</div>
+      <div class="small">Remaining in current weeks</div>
+    </div>
+    <div class="panel metric">
+      <div class="label">💳 CC Projection</div>
+      <div class="value">${fmt.format(ccProjection)}</div>
+      <div class="small">If settled today</div>
     </div>`;
 }
 
@@ -106,14 +165,19 @@ function renderWeeks() {
           <div class="stat"><div class="label">Left over</div><div class="num">${fmt.format(week.leftover)}</div></div>
           <div class="stat potmini"><div class="label">POT after week</div><div class="num">${fmt.format(week.endingPot)}</div></div>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>Date</th><th>Cost / Purchase</th><th>Category</th><th>Amount</th><th></th></tr>
-            </thead>
-            <tbody>${rows || `<tr><td colspan="5" class="small" style="padding:16px">No costs entered yet.</td></tr>`}</tbody>
-          </table>
-        </div>
+        <details class="expense-details ${frozen ? 'open' : ''}">
+          <summary style="cursor:pointer; padding:8px; font-weight:600; color:var(--muted);">
+            ▼ Expenses (${rows ? rows.split('<tr>').length - 1 : 0})
+          </summary>
+          <div class="table-wrap" style="padding-top:8px;">
+            <table>
+              <thead>
+                <tr><th>Date</th><th>Cost / Purchase</th><th>Category</th><th>Amount</th><th></th></tr>
+              </thead>
+              <tbody>${rows || `<tr><td colspan="5" class="small" style="padding:16px">No costs entered yet.</td></tr>`}</tbody>
+            </table>
+          </div>
+        </details>
         <div class="expense-actions">
           <div>${frozen ? `<button class="secondary" onclick="unfinalizeWeek(${week.i})">Unfinalize week</button>` : `<button class="secondary" onclick="addExpense(${week.i})">+ Add cost</button> <button onclick="finalizeWeek(${week.i})">Finalize week</button>`}</div>
           <span class="small">${frozen ? `Frozen on ${week.finalizedAt || 'saved date'}` : 'Finalizing adds/removes this week's leftover from POT.'}</span>

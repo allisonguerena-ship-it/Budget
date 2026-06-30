@@ -64,57 +64,59 @@
     </div>
   </div>
 
-  <section class="grid cards" id="metricCards"></section>
-
-  <section class="grid top">
-    <div class="panel">
-      <div class="label">Core budget settings</div>
-      <div class="settings">
-        <div><label>Monthly take-home income</label><input id="income" type="number" step="0.01"></div>
-        <div><label>Opening POT</label><input id="openingPot" type="number" step="0.01"></div>
-        <div><label>Monthly fixed bills</label><input id="fixedTotal" type="number" step="0.01" disabled></div>
-      </div>
-      <div class="toolbar">
-        <button onclick="saveCoreSettings()">Update core budget</button>
-        <button class="secondary" onclick="addWeek()">+ Add next 7-day week</button>
-        <button class="secondary" onclick="downloadCSV()">Export CSV backup</button>
-        <button class="danger" onclick="resetData()">Reset</button>
-      </div>
-      <div class="note"><b>Allowance formula:</b> weekly allowance = (monthly income − fixed bills active for that week) × 12 ÷ 365 × 7. This avoids fake 4-week/5-week month math.</div>
-    </div>
-    <div class="panel">
-      <div class="label">Allowance vs spent</div>
-      <div class="chartbox"><canvas id="spendChart"></canvas></div>
-    </div>
-  </section>
-
-  <details class="section-card">
-    <summary>
-      <div><h2>Fixed bills / recurring costs</h2><div class="sub">Hidden by default because there can be a lot of rows. These are the key inputs that calculate allowance.</div></div>
-      <div class="chev">Open / close</div>
-    </summary>
-    <div class="inside">
-      <div class="toolbar"><button class="secondary" onclick="addFixedBill()">+ Add fixed bill</button></div>
-      <div class="table-wrap wide-table">
-        <table>
-          <thead><tr><th>Name</th><th>Category</th><th>Monthly amount</th><th>Starts</th><th>Ends after</th><th>Active?</th><th></th></tr></thead>
-          <tbody id="fixedBillRows"></tbody>
-        </table>
-      </div>
-      <div class="note">When you change or cancel something, use the start/end dates. The app applies it only to weeks on or after those dates. Finalized weeks stay frozen unless you unfinalize them.</div>
-    </div>
-  </details>
-
-  <div class="tabs">
-    <button id="budgetTab" class="tab active" onclick="showView('budget')">Weekly budget</button>
-    <button id="cashTab" class="tab" onclick="showView('cash')">Cash-flow planner</button>
+  <!-- Main Tab Navigation -->
+  <div class="main-tabs">
+    <button id="overviewTabBtn" class="main-tab active" onclick="switchMainTab('overview')">Overview</button>
+    <button id="detailedTabBtn" class="main-tab" onclick="switchMainTab('detailed')">Detailed</button>
+    <button id="weeklyTabBtn" class="main-tab" onclick="switchMainTab('weekly')">Weekly</button>
   </div>
 
-  <main id="budgetView">
-    <section class="weeks" id="weeks"></section>
+  <!-- TAB 1: OVERVIEW -->
+  <main id="overviewTab" class="main-tab-content active">
+    <div class="grid cards" id="metricCards"></div>
   </main>
 
-  <main id="cashView" class="hidden">
+  <!-- TAB 2: DETAILED -->
+  <main id="detailedTab" class="main-tab-content hidden">
+    <section class="grid top">
+      <div class="panel">
+        <div class="label">Core budget settings</div>
+        <div class="settings">
+          <div><label>Monthly take-home income</label><input id="income" type="number" step="0.01"></div>
+          <div><label>Opening POT</label><input id="openingPot" type="number" step="0.01"></div>
+          <div><label>Monthly fixed bills</label><input id="fixedTotal" type="number" step="0.01" disabled></div>
+        </div>
+        <div class="toolbar">
+          <button onclick="saveCoreSettings()">Update core budget</button>
+          <button class="secondary" onclick="addWeek()">+ Add next 7-day week</button>
+          <button class="secondary" onclick="downloadCSV()">Export CSV backup</button>
+          <button class="danger" onclick="resetData()">Reset</button>
+        </div>
+        <div class="note"><b>Allowance formula:</b> weekly allowance = (monthly income − fixed bills active for that week) × 12 ÷ 365 × 7. This avoids fake 4-week/5-week month math.</div>
+      </div>
+      <div class="panel">
+        <div class="label">Allowance vs spent</div>
+        <div class="chartbox"><canvas id="spendChart"></canvas></div>
+      </div>
+    </section>
+
+    <details class="section-card">
+      <summary>
+        <div><h2>Fixed bills / recurring costs</h2><div class="sub">Hidden by default because there can be a lot of rows. These are the key inputs that calculate allowance.</div></div>
+        <div class="chev">Open / close</div>
+      </summary>
+      <div class="inside">
+        <div class="toolbar"><button class="secondary" onclick="addFixedBill()">+ Add fixed bill</button></div>
+        <div class="table-wrap wide-table">
+          <table>
+            <thead><tr><th>Name</th><th>Category</th><th>Monthly amount</th><th>Starts</th><th>Ends after</th><th>Active?</th><th></th></tr></thead>
+            <tbody id="fixedBillRows"></tbody>
+          </table>
+        </div>
+        <div class="note">When you change or cancel something, use the start/end dates. The app applies it only to weeks on or after those dates. Finalized weeks stay frozen unless you unfinalize them.</div>
+      </div>
+    </details>
+
     <section class="section-card">
       <h2>Cash-flow planner</h2>
       <div class="sub">This is separate from weekly allowance. It is for actual timing: paychecks, rent, card due dates, and planned expenses.</div>
@@ -148,6 +150,11 @@
         </div>
       </div>
     </section>
+  </main>
+
+  <!-- TAB 3: WEEKLY -->
+  <main id="weeklyTab" class="main-tab-content hidden">
+    <section class="weeks" id="weeks"></section>
   </main>
 </div>
 

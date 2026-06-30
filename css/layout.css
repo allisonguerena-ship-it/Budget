@@ -2,6 +2,71 @@
   --bg: #fbf7f4;
 }
 
+/* Main Tab Navigation */
+.main-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 0;
+  margin-bottom: 18px;
+  border-bottom: 2px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.main-tab {
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.main-tab:hover {
+  border-color: var(--pink);
+  color: var(--ink);
+}
+
+.main-tab.active {
+  background: var(--pink);
+  color: white;
+  border-color: var(--pink);
+}
+
+/* Main Tab Content */
+.main-tab-content {
+  display: block;
+}
+
+.main-tab-content.hidden {
+  display: none;
+}
+
+/* Collapsible expenses */
+.expense-details {
+  margin-top: 12px;
+}
+
+.expense-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.expense-details summary::before {
+  content: '▼ ';
+  font-weight: 600;
+}
+
+.expense-details[open] summary::before {
+  content: '▲ ';
+}
+
+.expense-details:not([open]) summary::before {
+  content: '▶ ';
+}
+
 details.section-card {
   padding: 0;
   overflow: hidden;
@@ -288,6 +353,16 @@ details.section-card .inside {
 
   .week-tab {
     padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .main-tabs {
+    gap: 6px;
+    padding: 10px 0;
+  }
+
+  .main-tab {
+    padding: 8px 12px;
     font-size: 12px;
   }
 }
