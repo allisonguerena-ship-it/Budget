@@ -147,6 +147,66 @@ details.section-card .inside {
   height: 260px;
 }
 
+/* Week navigation tabs */
+.week-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+  border-bottom: 2px solid var(--line);
+  margin-bottom: 18px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.week-tab {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.week-tab:hover {
+  border-color: var(--pink);
+  color: var(--ink);
+}
+
+.week-tab.active {
+  background: var(--pink);
+  color: white;
+  border-color: var(--pink);
+}
+
+.weeks-container {
+  position: relative;
+}
+
+.week.hidden {
+  display: none;
+}
+
+.week.active {
+  display: block;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 1050px) {
   body {
     padding: 16px;
@@ -219,5 +279,15 @@ details.section-card .inside {
 
   .month-title {
     font-size: 18px;
+  }
+
+  .week-tabs {
+    gap: 6px;
+    padding: 10px 0;
+  }
+
+  .week-tab {
+    padding: 6px 10px;
+    font-size: 12px;
   }
 }

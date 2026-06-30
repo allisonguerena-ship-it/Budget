@@ -29,7 +29,6 @@ function renderMetrics() {
   const activeAllowance = weeklyAllowance(data.currentMonth + "-01");
   const totalSpent = weeks.reduce((sum, week) => sum + (Number(week.used) || 0), 0);
   const totalLeft = weeks.reduce((sum, week) => sum + (Number(week.leftover) || 0), 0);
-  const finalPot = weeks[weeks.length - 1]?.endingPot ?? data.openingPot;
 
   document.getElementById("metricCards").innerHTML = `
     <div class="panel metric">
@@ -43,14 +42,9 @@ function renderMetrics() {
       <div class="small">Entered weekly costs</div>
     </div>
     <div class="panel metric leftover">
-      <div class="label">Left over in view</div>
+      <div class="label">Leftover</div>
       <div class="value">${fmt.format(totalLeft)}</div>
       <div class="small">Allowance minus spent</div>
-    </div>
-    <div class="panel metric pot">
-      <div class="label">Projected POT</div>
-      <div class="value">${fmt.format(finalPot)}</div>
-      <div class="small">Finalized weeks stay frozen</div>
     </div>`;
 }
 
@@ -71,7 +65,17 @@ function renderFixedBills() {
 
 function renderWeeks() {
   const weeks = calcWeeks();
-  document.getElementById("weeks").innerHTML = weeks.map(week => {
+  const currentWeekIndex = Math.max(0, weeks.findIndex(w => !w.finalized));
+  
+  // Build tabs
+  const tabs = weeks.map((week, i) => `
+    <button class="week-tab ${i === currentWeekIndex ? 'active' : ''}" onclick="switchWeek(${i})">
+      Week ${i + 1}
+    </button>
+  `).join("");
+
+  // Build week cards with data attributes for tab selection
+  const weekCards = weeks.map((week, i) => {
     const frozen = week.finalized;
     const rows = weekExpenses(week.i).map(expense => {
       const idx = current().expenses.indexOf(expense);
@@ -87,7 +91,7 @@ function renderWeeks() {
 
     const ok = week.leftover >= 0;
     return `
-      <div class="week ${frozen ? 'finalized' : ''}">
+      <div class="week ${frozen ? 'finalized' : ''} ${i === currentWeekIndex ? 'active' : 'hidden'}" data-week-index="${i}">
         <div class="week-head">
           <div>
             <div class="week-title">Week ${week.i + 1}: ${shortDate(week.date)} – ${shortDate(addDays(week.date, 6))}</div>
@@ -112,11 +116,78 @@ function renderWeeks() {
         </div>
         <div class="expense-actions">
           <div>${frozen ? `<button class="secondary" onclick="unfinalizeWeek(${week.i})">Unfinalize week</button>` : `<button class="secondary" onclick="addExpense(${week.i})">+ Add cost</button> <button onclick="finalizeWeek(${week.i})">Finalize week</button>`}</div>
-          <span class="small">${frozen ? `Frozen on ${week.finalizedAt || 'saved date'}` : 'Finalizing adds/removes this week’s leftover from POT.'}</span>
+          <span class="small">${frozen ? `Frozen on ${week.finalizedAt || 'saved date'}` : 'Finalizing adds/removes this week's leftover from POT.'}</span>
         </div>
       </div>`;
   }).join("");
+
+  document.getElementById("weeks").innerHTML = `
+    <div class="week-tabs">${tabs}</div>
+    <div class="weeks-container">${weekCards}</div>
+  `;
+  
+  setupWeekNavigation();
 }
+
+function switchWeek(index) {
+  const allWeeks = document.querySelectorAll('[data-week-index]');
+  const allTabs = document.querySelectorAll('.week-tab');
+  
+  allWeeks.forEach(week => {
+    week.classList.remove('active');
+    week.classList.add('hidden');
+  });
+  
+  allTabs.forEach(tab => tab.classList.remove('active'));
+  
+  const selectedWeek = document.querySelector(`[data-week-index="${index}"]`);
+  const selectedTab = document.querySelectorAll('.week-tab')[index];
+  
+  if (selectedWeek) {
+    selectedWeek.classList.remove('hidden');
+    selectedWeek.classList.add('active');
+  }
+  if (selectedTab) {
+    selectedTab.classList.add('active');
+  }
+}
+
+function setupWeekNavigation() {
+  const container = document.querySelector('.weeks-container');
+  if (!container) return;
+  
+  let startX = 0;
+  let currentX = 0;
+  let isDragging = false;
+  
+  container.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    isDragging = true;
+  });
+  
+  container.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    currentX = e.touches[0].clientX;
+  });
+  
+  container.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    
+    const diff = startX - currentX;
+    const threshold = 50;
+    
+    const allTabs = document.querySelectorAll('.week-tab');
+    const activeTab = Array.from(allTabs).findIndex(t => t.classList.contains('active'));
+    
+    if (diff > threshold && activeTab < allTabs.length - 1) {
+      switchWeek(activeTab + 1);
+    } else if (diff < -threshold && activeTab > 0) {
+      switchWeek(activeTab - 1);
+    }
+  });
+}
+
 
 function renderPlanner() {
   document.getElementById("plannedRows").innerHTML = (data.plannedExpenses || []).map((plan, index) => `
