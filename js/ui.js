@@ -1,26 +1,34 @@
 function render() {
-  ensureMonth(data.currentMonth);
-  document.getElementById("income").value = data.income;
-  document.getElementById("openingPot").value = data.openingPot;
-  document.getElementById("fixedTotal").value = monthlyFixedOn(data.currentMonth + "-01").toFixed(2);
+  try {
+    ensureMonth(data.currentMonth);
+    document.getElementById("income").value = data.income;
+    document.getElementById("openingPot").value = data.openingPot;
+    document.getElementById("fixedTotal").value = monthlyFixedOn(data.currentMonth + "-01").toFixed(2);
 
-  Object.entries(data.cash).forEach(([key, value]) => {
-    const element = document.getElementById(key);
-    if (element) element.value = value;
-  });
+    Object.entries(data.cash).forEach(([key, value]) => {
+      const element = document.getElementById(key);
+      if (element) element.value = value;
+    });
 
-  document.querySelectorAll("[data-lockable]").forEach(el => {
-    el.disabled = data.cash.locked;
-  });
+    document.querySelectorAll("[data-lockable]").forEach(el => {
+      el.disabled = data.cash.locked;
+    });
 
-  document.getElementById("cashLockBtn").textContent = data.cash.locked ? "Unlock cash-flow constants" : "Lock cash-flow constants";
-  document.getElementById("monthTitle").textContent = monthName(data.currentMonth);
+    document.getElementById("cashLockBtn").textContent = data.cash.locked ? "Unlock cash-flow constants" : "Lock cash-flow constants";
+    document.getElementById("monthTitle").textContent = monthName(data.currentMonth);
 
-  renderMetrics();
-  renderFixedBills();
-  renderWeeks();
-  renderChart();
-  renderPlanner();
+    renderMetrics();
+    renderFixedBills();
+    renderWeeks();
+    renderChart();
+    renderPlanner();
+  } catch (error) {
+    console.error('ERROR in render():', error);
+    const msg = 'ERROR: ' + error.message + '\nCheck browser console (F12) for details.';
+    if (document.body) {
+      document.body.innerHTML = '<div style="padding:2rem; color:red; font-family:monospace; white-space:pre-wrap;">' + msg + '\n\n' + error.stack + '</div>';
+    }
+  }
 }
 
 function switchMainTab(tabName) {
