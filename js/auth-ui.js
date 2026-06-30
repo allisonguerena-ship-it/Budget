@@ -16,7 +16,7 @@ class AuthUI {
   }
 
   waitForCloudSync() {
-    if (typeof cloudSync === 'undefined' || !cloudSync) {
+    if (typeof cloudSync === 'undefined' || !cloudSync || !cloudSync.initialized) {
       setTimeout(() => this.waitForCloudSync(), 100);
       return;
     }
