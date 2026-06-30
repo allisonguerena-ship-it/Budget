@@ -215,7 +215,7 @@ function renderWeeks() {
         </details>
         <div class="expense-actions">
           <div>${frozen ? `<button class="secondary" onclick="unfinalizeWeek(${week.i})">Unfinalize week</button>` : `<button class="secondary" onclick="addExpense(${week.i})">+ Add cost</button> <button onclick="finalizeWeek(${week.i})">Finalize week</button>`}</div>
-          <span class="small">${frozen ? `Frozen on ${week.finalizedAt || 'saved date'}` : 'Finalizing adds/removes this week's leftover from POT.'}<span class="small">${frozen ? 'Frozen on ${week.finalizedAt || 'saved date'}` : `Finalizing adds/removes this week's leftover from POT.`}</span>
+          <span class="small">${frozen ? `Frozen on ${week.finalizedAt || 'saved date'}` : `Finalizing adds/removes this week's leftover from POT.`}</span>
         </div>
       </div>`;
   }).join("");
