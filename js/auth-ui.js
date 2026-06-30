@@ -11,18 +11,18 @@ class AuthUI {
     this.logoutBtn = document.getElementById('logoutBtn');
     this.syncStatusEl = document.getElementById('syncStatus');
     
-    // Start with local-only mode, will update if cloud sync initializes
-    this.setLocalOnlyMode();
-    
-    // Wait for cloudSync to become available (non-blocking)
+    // Wait for cloudSync to be available
     this.waitForCloudSync();
   }
 
-  setLocalOnlyMode() {
-    // Show local-only mode by default
-    if (this.authToggleBtn) this.authToggleBtn.style.display = 'inline-block';
-    if (this.logoutBtn) this.logoutBtn.style.display = 'none';
-    if (this.syncStatusEl) this.syncStatusEl.textContent = 'Saves in this browser only';
+  waitForCloudSync() {
+    if (typeof cloudSync === 'undefined' || !cloudSync || !cloudSync.initialized) {
+      setTimeout(() => this.waitForCloudSync(), 100);
+      return;
+    }
+    
+    this.setupAuthListeners();
+    this.updateUI();
   }
 
   waitForCloudSync() {
