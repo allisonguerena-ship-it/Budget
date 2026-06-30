@@ -1,4 +1,4 @@
-const CACHE_NAME = "pot-budget-v5";
+const CACHE_NAME = "squid-budget-v1";
 const ASSETS = [
 	"./",
 	"./index.html",
