@@ -48,10 +48,10 @@ function defaultWeekStarts(key) {
   // Go back to the Monday of this week
   if (dayOfWeek !== 1) {
     if (dayOfWeek === 0) {
-      // Sunday - go back 1 day to Monday of previous week
-      d.setDate(d.getDate() - 1);
+      // Sunday - go back 6 days to Monday of the week containing this day
+      d.setDate(d.getDate() - 6);
     } else {
-      // Mon-Sat: go back to Monday of this week
+      // Tue-Sat: go back to Monday of this week
       d.setDate(d.getDate() - (dayOfWeek - 1));
     }
   }
