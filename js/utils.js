@@ -37,13 +37,33 @@ function todayISO() {
 }
 
 function defaultWeekStarts(key) {
+  // Generate weeks that start on Monday and end on Sunday
   const start = firstOfMonth(key);
   const starts = [];
+  
+  // Find the first Monday of the month or the Monday of the first week
   let d = new Date(start);
-  while (d.getMonth() === start.getMonth()) {
-    starts.push(d.toISOString().slice(0, 10));
-    d.setDate(d.getDate() + 7);
+  const dayOfWeek = d.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+  
+  // Go back to the Monday of this week
+  if (dayOfWeek !== 1) {
+    if (dayOfWeek === 0) {
+      // Sunday - go back 1 day to Monday of previous week
+      d.setDate(d.getDate() - 1);
+    } else {
+      // Mon-Sat: go back to Monday of this week
+      d.setDate(d.getDate() - (dayOfWeek - 1));
+    }
   }
+  
+  // Generate all Mondays that have days in this month
+  const monthEnd = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+  
+  while (d <= monthEnd) {
+    starts.push(d.toISOString().slice(0, 10));
+    d.setDate(d.getDate() + 7); // Next Monday
+  }
+  
   return starts;
 }
 

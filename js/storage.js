@@ -61,6 +61,19 @@ function loadData() {
 
   for (const [m, obj] of Object.entries(saved.months)) {
     obj.weekStarts ||= defaultWeekStarts(m);
+    
+    // Migration: ensure week starts are on Mondays
+    // Check if weekStarts are already Monday-aligned; if not, recalculate
+    const needsMigration = obj.weekStarts.some(dateStr => {
+      const d = new Date(dateStr + "T00:00:00");
+      return d.getDay() !== 1; // 1 = Monday
+    });
+    
+    if (needsMigration) {
+      console.log(`💾 [storage.js] Migrating week starts for ${m} to Monday alignment`);
+      obj.weekStarts = defaultWeekStarts(m);
+    }
+    
     obj.expenses ||= [];
     obj.finalizedWeeks ||= {};
   }
