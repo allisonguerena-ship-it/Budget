@@ -84,6 +84,8 @@ function scrollToCurrentWeek() {
   }
 }
 
+let cardIndex = 0; // For swipe navigation
+
 function renderMetrics() {
   const weeks = calcWeeks();
   const currentMonth = data.currentMonth;
@@ -93,6 +95,7 @@ function renderMetrics() {
   const dayOfMonth = today.getDate();
   const daysRemaining = lastDayOfMonth - dayOfMonth + 1;
   const percentComplete = Math.round((dayOfMonth / daysInMonth) * 100);
+  cardIndex = 0; // Reset to first card
   
   // Get the REAL POT balance (finalized weeks only)
   const realPot = getCurrentPotBalance();
@@ -138,6 +141,49 @@ function renderMetrics() {
       <div class="value">${paceStatus}</div>
       <div class="small">${Math.round(spendingPercent * 100)}% of budget used</div>
     </div>`;
+  
+  // Add swipe gesture support for cards on mobile
+  setupCardSwipe();
+}
+
+function setupCardSwipe() {
+  const container = document.getElementById("metricCards");
+  if (!container) return;
+  
+  let startX = 0;
+  let startY = 0;
+  
+  container.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, false);
+  
+  container.addEventListener('touchend', (e) => {
+    if (!startX) return;
+    
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const diffX = startX - endX;
+    const diffY = startY - endY;
+    
+    // Must be more horizontal than vertical
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+      const cards = container.querySelectorAll('.panel.metric');
+      if (diffX > 0) {
+        // Swiped left - next card
+        cardIndex = (cardIndex + 1) % cards.length;
+      } else {
+        // Swiped right - previous card
+        cardIndex = (cardIndex - 1 + cards.length) % cards.length;
+      }
+      
+      // Scroll to card with animation
+      cards[cardIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+    
+    startX = 0;
+    startY = 0;
+  }, false);
 }
 
 function renderFixedBills() {
@@ -192,11 +238,9 @@ function renderWeeks() {
           <div class="badge ${frozen ? 'warn' : (ok ? 'good' : 'bad')}">${frozen ? 'Finalized' : (ok ? `${fmt.format(week.leftover)} left` : `${fmt.format(Math.abs(week.leftover))} over`)}</div>
         </div>
         <div class="week-stats">
-          <div class="stat"><div class="label">Fixed bills used</div><div class="num">${fmt.format(week.fixed)}</div></div>
           <div class="stat"><div class="label">Allowance</div><div class="num">${fmt.format(week.allowance)}</div></div>
           <div class="stat"><div class="label">Spent</div><div class="num">${fmt.format(week.used)}</div></div>
           <div class="stat"><div class="label">Left over</div><div class="num">${fmt.format(week.leftover)}</div></div>
-          <div class="stat potmini"><div class="label">${frozen ? 'POT after week' : 'Would add to POT'}</div><div class="num">${fmt.format(week.leftover)}</div></div>
         </div>
         <details class="expense-details ${frozen ? 'open' : ''}">
           <summary style="cursor:pointer; padding:8px; font-weight:600; color:var(--muted);">

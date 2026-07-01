@@ -23,19 +23,21 @@ function getPriorFinalizedPot(monthKey, beforeDate) {
   return pot;
 }
 
-// Get the REAL current POT balance (opening POT + finalized leftovers only)
+// Get the REAL current POT balance (use most recent finalized week's endingPot)
 function getCurrentPotBalance() {
   let pot = Number(data.openingPot) || 0;
+  let latestDate = "";
   
+  // Find the most recent finalized week
   for (const [mk, month] of Object.entries(data.months)) {
     for (const [idx, finalized] of Object.entries(month.finalizedWeeks || {})) {
-      // Add the leftover from this finalized week
-      pot = Number(finalized.endingPot) || 0;
+      const weekDate = finalized.date || (month.weekStarts || [])[Number(idx)] || "";
+      if (weekDate > latestDate) {
+        latestDate = weekDate;
+        pot = Number(finalized.endingPot) || 0;
+      }
     }
   }
-  
-  // Subtract any POT withdrawals
-  pot -= (Number(data.potWithdrawn) || 0);
   
   return pot;
 }

@@ -42,7 +42,6 @@ function loadData() {
         bufferTarget: 2000,
         locked: true
       },
-      potWithdrawn: 0,
       plannedExpenses: [{ date: tk + "-15", desc: "Sister bachelorette trip flights", type: "Trip/Travel", amount: 0, paid: false }],
       months: {}
     };
@@ -54,7 +53,6 @@ function loadData() {
   saved.fixedBills ||= [{ name: "Fixed bills legacy total", category: "Other", amount: Number(saved.fixed) || 0, startDate: saved.currentMonth + "-01", endDate: "", active: true }];
   saved.cash ||= { cashStart: 0, paycheckAmount: 2854.34, payday1: 5, payday2: 20, rentDueDay: 30, rentAmount: 3098, ccDueDay: 14, ccPaymentAmount: 0, bufferTarget: 2000, locked: true };
   saved.cash.locked = saved.cash.locked !== false;
-  saved.potWithdrawn ||= 0;
   saved.plannedExpenses ||= [];
   saved.learnedCategories ||= {};
   saved.months ||= {};
