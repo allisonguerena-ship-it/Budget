@@ -309,6 +309,28 @@ details.section-card .inside {
     gap: 12px;
   }
 
+  .cards {
+    grid-template-columns: repeat(5, minmax(140px, 1fr));
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    gap: 10px;
+    padding-bottom: 8px;
+  }
+
+  .cards::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .cards::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .cards::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+  }
+
   .week-head {
     padding: 12px 14px;
     gap: 10px;

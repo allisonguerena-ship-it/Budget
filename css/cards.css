@@ -61,3 +61,29 @@
   align-items: center;
   justify-content: space-between;
 }
+
+/* Mobile optimizations for metric cards */
+@media (max-width: 480px) {
+  .metric {
+    min-height: 90px;
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .metric .label {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .metric .value {
+    font-size: 18px;
+    font-weight: 875;
+    margin-top: 4px;
+  }
+
+  .metric .small {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+}

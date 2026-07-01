@@ -70,9 +70,27 @@
     <button id="detailedTabBtn" class="main-tab" onclick="switchMainTab('detailed')">Detailed</button>
   </div>
 
-  <!-- TAB 1: HOME (Weekly + Headline Cards) -->
+  <!-- TAB 1: HOME (Headline Cards + Fixed Bills + Weekly) -->
   <main id="homeTab" class="main-tab-content active">
     <div class="grid cards" id="metricCards"></div>
+    
+    <details class="section-card">
+      <summary>
+        <div><h2>Fixed bills / recurring costs</h2><div class="sub">Hidden by default because there can be a lot of rows. These are the key inputs that calculate allowance.</div></div>
+        <div class="chev">Open / close</div>
+      </summary>
+      <div class="inside">
+        <div class="toolbar"><button class="secondary" onclick="addFixedBill()">+ Add fixed bill</button></div>
+        <div class="table-wrap wide-table">
+          <table>
+            <thead><tr><th>Name</th><th>Category</th><th>Monthly amount</th><th>Active?</th><th></th></tr></thead>
+            <tbody id="fixedBillRows"></tbody>
+          </table>
+        </div>
+        <div class="note">Disable a bill to remove it from your allowance calculation. Unfinalize a week to recalculate with bill changes.</div>
+      </div>
+    </details>
+    
     <section class="weeks" id="weeks"></section>
   </main>
 
@@ -102,23 +120,6 @@
         <div class="chartbox"><canvas id="spendChart"></canvas></div>
       </div>
     </section>
-
-    <details class="section-card">
-      <summary>
-        <div><h2>Fixed bills / recurring costs</h2><div class="sub">Hidden by default because there can be a lot of rows. These are the key inputs that calculate allowance.</div></div>
-        <div class="chev">Open / close</div>
-      </summary>
-      <div class="inside">
-        <div class="toolbar"><button class="secondary" onclick="addFixedBill()">+ Add fixed bill</button></div>
-        <div class="table-wrap wide-table">
-          <table>
-            <thead><tr><th>Name</th><th>Category</th><th>Monthly amount</th><th>Active?</th><th></th></tr></thead>
-            <tbody id="fixedBillRows"></tbody>
-          </table>
-        </div>
-        <div class="note">Disable a bill to remove it from your allowance calculation. Unfinalize a week to recalculate with bill changes.</div>
-      </div>
-    </details>
 
     <section class="section-card">
       <h2>Cash-flow planner</h2>
