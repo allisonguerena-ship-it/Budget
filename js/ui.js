@@ -192,13 +192,11 @@ function renderFixedBills() {
       <td><input class="nameinput" value="${escapeHtml(bill.name || "")}" placeholder="ex: Car payment" onchange="updateFixedBill(${index}, 'name', this.value)"></td>
       <td><select onchange="updateFixedBill(${index}, 'category', this.value)">${billCats.map(category => `<option ${bill.category === category ? 'selected' : ''}>${category}</option>`).join("")}</select></td>
       <td><input type="number" step="0.01" value="${Number(bill.amount) || 0}" onchange="updateFixedBill(${index}, 'amount', this.value)"></td>
-      <td><input type="date" value="${bill.startDate || todayISO()}" onchange="updateFixedBill(${index}, 'startDate', this.value)"></td>
-      <td><input type="date" value="${bill.endDate || ''}" onchange="updateFixedBill(${index}, 'endDate', this.value)"></td>
       <td><input type="checkbox" ${bill.active !== false ? 'checked' : ''} onchange="updateFixedBill(${index}, 'active', this.checked)"></td>
       <td><button class="danger tiny" onclick="deleteFixedBill(${index})">×</button></td>
     </tr>`).join("");
 
-  document.getElementById("fixedBillRows").innerHTML = rows || `<tr><td colspan="7" class="small">No fixed bills yet.</td></tr>`;
+  document.getElementById("fixedBillRows").innerHTML = rows || `<tr><td colspan="5" class="small">No fixed bills yet.</td></tr>`;
 }
 
 function renderWeeks() {
@@ -375,9 +373,8 @@ function downloadCSV() {
   });
 
   (data.fixedBills || []).forEach(bill => {
-    rows.push(["", "Fixed Bill", "", "", bill.startDate, bill.name, bill.category, bill.amount, bill.endDate ? ("Ends " + bill.endDate) : "Active"]);
+    rows.push(["", "Fixed Bill", "", "", bill.name, bill.category, bill.amount, bill.active !== false ? "Active" : "Inactive"]);
   });
-
   (data.plannedExpenses || []).forEach(plan => {
     rows.push([String(plan.date).slice(0, 7), "Planned", "", "", plan.date, plan.desc, plan.type, plan.amount, plan.paid ? "Paid" : "Outstanding"]);
   });

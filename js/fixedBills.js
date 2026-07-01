@@ -3,8 +3,6 @@ function addFixedBill() {
     name: "",
     category: "Subscription",
     amount: 0,
-    startDate: todayISO(),
-    endDate: "",
     active: true
   });
   save();

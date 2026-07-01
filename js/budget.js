@@ -1,10 +1,5 @@
 function activeFixedBillsOn(date) {
-  return (data.fixedBills || []).filter(b => {
-    if (b.active === false) return false;
-    const start = b.startDate || "1900-01-01";
-    const end = b.endDate || "9999-12-31";
-    return start <= date && date <= end;
-  });
+  return (data.fixedBills || []).filter(b => b.active !== false);
 }
 
 function monthlyFixedOn(date) {
