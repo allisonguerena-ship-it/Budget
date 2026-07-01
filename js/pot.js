@@ -56,7 +56,8 @@ function calcWeeks() {
   month.weekStarts.forEach((date, index) => {
     const finalized = month.finalizedWeeks?.[index];
     if (finalized) {
-      weekArray.push({ ...finalized, i: index, finalized: true });
+      const endDate = addDays(finalized.date || date, 6);
+      weekArray.push({ ...finalized, i: index, finalized: true, endDate });
       runningPot = Number(finalized.endingPot) || 0;
       return;
     }
@@ -65,10 +66,12 @@ function calcWeeks() {
     const used = spent(index);
     const leftover = leftoverForWeek(allowance, used);
     const weekEndingPot = endingPot(runningPot, leftover);
+    const endDate = addDays(date, 6); // Week is 7 days: date to date+6
 
     weekArray.push({
       i: index,
       date,
+      endDate,
       startPot: runningPot,
       allowance,
       used,

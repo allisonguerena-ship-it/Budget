@@ -94,27 +94,19 @@ function renderMetrics() {
   // Get the REAL POT balance (finalized weeks only)
   const realPot = getCurrentPotBalance();
   
-  // Calculate this month's spending and allowance (unfinalized weeks only)
-  const unfinWeeks = weeks.filter(w => !w.finalized);
-  const totalSpentUnfin = unfinWeeks.reduce((sum, week) => sum + (Number(week.used) || 0), 0);
-  const totalAllowanceUnfin = unfinWeeks.reduce((sum, week) => sum + (Number(week.allowance) || 0), 0);
-  const totalAvailableUnfin = totalAllowanceUnfin - totalSpentUnfin;
-  
-  // Find current week
-  const today = new Date();
-  const currentWeekNum = weeks.findIndex(w => {
-    const start = new Date(w.startDate);
-    const end = new Date(w.endDate);
-    return today >= start && today <= end;
-  }) + 1 || 1;
-  const weeksRemaining = Math.max(0, weeks.length - currentWeekNum + 1);
+  // Calculate this month's spending and allowance (ALL weeks in current month)
+  // Available This Month = sum of all weeks' allowance - total spent across all weeks
+  // This does NOT include POT
+  const totalSpentThisMonth = weeks.reduce((sum, week) => sum + (Number(week.used) || 0), 0);
+  const totalAllowanceThisMonth = weeks.reduce((sum, week) => sum + (Number(week.allowance) || 0), 0);
+  const availableThisMonth = totalAllowanceThisMonth - totalSpentThisMonth;
   
   // Calculate if spending pace matches days passed
-  const today_date = new Date();
+  const today = new Date();
   const daysInMonth = new Date(currentMonth.split('-')[0], currentMonth.split('-')[1], 0).getDate();
-  const dayOfMonth = today_date.getDate();
+  const dayOfMonth = today.getDate();
   const daysCompletePercent = (dayOfMonth / daysInMonth);
-  const spendingPercent = totalSpentUnfin / Math.max(1, totalAllowanceUnfin);
+  const spendingPercent = totalSpentThisMonth / Math.max(1, totalAllowanceThisMonth);
   const paceStatus = Math.abs(daysCompletePercent - spendingPercent) < 0.15 
     ? '✓ On pace' 
     : (spendingPercent > daysCompletePercent 
@@ -122,30 +114,25 @@ function renderMetrics() {
       : '✓ Behind pace');
 
   document.getElementById("metricCards").innerHTML = `
+    <div class="panel metric leftover">
+      <div class="label">✅ Available This Month</div>
+      <div class="value">${fmt.format(availableThisMonth)}</div>
+      <div class="small">(Monthly budget left to spend)</div>
+    </div>
+    <div class="panel metric spent">
+      <div class="label">💸 Total Spent This Month</div>
+      <div class="value">${fmt.format(totalSpentThisMonth)}</div>
+      <div class="small">(Sum of all costs)</div>
+    </div>
     <div class="panel metric">
-      <div class="label">📊 Week ${currentWeekNum}</div>
-      <div class="value">${weeksRemaining}</div>
-      <div class="small">weeks left</div>
+      <div class="label">📈 Spending Pace</div>
+      <div class="value">${paceStatus}</div>
+      <div class="small">${Math.round(spendingPercent * 100)}% of budget used</div>
     </div>
     <div class="panel metric">
       <div class="label">💰 POT Balance</div>
       <div class="value">${fmt.format(realPot)}</div>
-      <div class="small">Accumulated buffer</div>
-    </div>
-    <div class="panel metric spent">
-      <div class="label">💸 Total spent</div>
-      <div class="value">${fmt.format(totalSpentUnfin)}</div>
-      <div class="small">This month</div>
-    </div>
-    <div class="panel metric leftover">
-      <div class="label">✅ Available</div>
-      <div class="value">${fmt.format(totalAvailableUnfin)}</div>
-      <div class="small">Remaining weeks</div>
-    </div>
-    <div class="panel metric">
-      <div class="label">📈 Spending pace</div>
-      <div class="value">${paceStatus}</div>
-      <div class="small">${Math.round(spendingPercent * 100)}% of budget used</div>
+      <div class="small">(Finalized weeks only)</div>
     </div>`;
   
   // Add swipe gesture support for cards on mobile

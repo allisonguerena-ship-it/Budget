@@ -7,7 +7,12 @@ function monthlyFixedOn(date) {
 }
 
 function weeklyAllowance(date) {
-  return ((Number(data.income) || 0) - monthlyFixedOn(date)) * 12 / 365 * 7;
+  // Weekly income = Monthly income × 12 ÷ 52
+  // Weekly allowance = Weekly income - Weekly fixed bills
+  // This is equivalent to: (Monthly income - Monthly fixed bills) × 12 ÷ 52
+  const monthlyIncome = Number(data.income) || 0;
+  const monthlyFixedBills = monthlyFixedOn(date);
+  return (monthlyIncome - monthlyFixedBills) * 12 / 52;
 }
 
 function weekExpenses(i) {
