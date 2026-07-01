@@ -398,7 +398,25 @@ details.section-card .inside {
   }
 
   .settings,
-  .cashsettings {
+  .cashsettings,
+  .plannergrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  button {
+    font-size: 11px;
+    padding: 6px 8px !important;
+  }
+}
+
+/* Mobile button wrapping fix */
+@media (max-width: 480px) {
+  button {
+    font-size: 10px;
+    padding: 4px 6px;
+    max-width: 140px;
+    flex-basis: auto;
   }
 }

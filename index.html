@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f3c6cf" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="POT Budget" />
+  <meta name="apple-mobile-web-app-title" content="Squid Budget" />
   <link rel="manifest" href="manifest.json" />
   <title>Squid Budget</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -22,7 +22,7 @@
 <!-- Auth Modal -->
 <div id="authModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999; align-items:center; justify-content:center;">
   <div style="background:white; border-radius:8px; padding:2rem; max-width:400px; width:90%;">
-    <h2>POT Budget</h2>
+    <h2>Squid Budget</h2>
     <div id="authContent">
       <p>Sign up or log in to sync across devices.</p>
       <div style="margin-bottom:1rem;">
@@ -38,10 +38,28 @@
   </div>
 </div>
 
+<!-- Welcome Modal for New Users -->
+<div id="welcomeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:998; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:24px; padding:2rem; max-width:500px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+    <h2 style="margin:0 0 0.5rem 0; font-size:24px; font-weight:850;">Welcome to Squid Budget 🦑</h2>
+    <div style="color:#8b7567; font-size:14px; margin-bottom:1.5rem; line-height:1.6;">
+      <p><strong>Squid Budget</strong> helps you plan your weekly spending with precision.</p>
+      <ul style="margin:0.5rem 0; padding-left:1.5rem;">
+        <li><strong>Weekly Allowance:</strong> Calculate how much you can spend each week based on your income and fixed bills</li>
+        <li><strong>Fixed Bills:</strong> Keep track of recurring monthly costs that affect your budget</li>
+        <li><strong>Week Planning:</strong> Finalize weeks to lock in your spending and build your POT savings</li>
+        <li><strong>Cash Flow:</strong> See paychecks, due dates, and planned expenses in a timeline</li>
+      </ul>
+      <p style="margin-top:1rem;"><strong>POT</strong> is your accumulated savings buffer that grows from finalized weeks.</p>
+    </div>
+    <button onclick="closeWelcome()" style="width:100%; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s ease;">Get Started</button>
+  </div>
+</div>
+
 <div class="wrap">
   <header>
     <div>
-      <h1>POT Budget</h1>
+      <h1>Squid Budget</h1>
       <div class="sub">Weekly allowance, fixed bills by effective date, finalized weeks, and a separate cash-flow planner.</div>
     </div>
     <div class="pill" id="syncStatus">Saves automatically in this browser</div>
@@ -175,6 +193,27 @@
   <script src="js/backup.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/app.js"></script>
+
+  <script>
+    // Show welcome modal for new users only
+    function initWelcome() {
+      const WELCOME_KEY = 'squid_has_seen_welcome';
+      const hasSeenWelcome = localStorage.getItem(WELCOME_KEY);
+      
+      if (!hasSeenWelcome) {
+        document.getElementById('welcomeModal').style.display = 'flex';
+      }
+    }
+    
+    function closeWelcome() {
+      const WELCOME_KEY = 'squid_has_seen_welcome';
+      localStorage.setItem(WELCOME_KEY, 'true');
+      document.getElementById('welcomeModal').style.display = 'none';
+    }
+    
+    // Show welcome on page load if it's the user's first visit
+    document.addEventListener('DOMContentLoaded', initWelcome);
+  </script>
 
 </body>
 </html>

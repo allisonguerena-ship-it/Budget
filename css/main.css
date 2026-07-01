@@ -135,3 +135,10 @@ h2 {
     padding: 0 14px 14px;
   }
 }
+
+/* Force no horizontal overflow on mobile */
+@media (max-width: 480px) {
+  body {
+    overflow-x: hidden !important;
+  }
+}
