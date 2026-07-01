@@ -95,3 +95,31 @@ function deleteExpense(globalIndex) {
   save();
   render();
 }
+
+// Use money from POT
+function usePotMoney(amount) {
+  const currentPot = getCurrentPotBalance();
+  amount = Number(amount) || 0;
+  
+  if (amount <= 0) {
+    alert("Enter an amount greater than $0");
+    return;
+  }
+  
+  if (amount > currentPot) {
+    alert(`Cannot withdraw $${amount.toFixed(2)}. Current POT balance is only $${currentPot.toFixed(2)}.`);
+    return;
+  }
+  
+  data.potWithdrawn = (Number(data.potWithdrawn) || 0) + amount;
+  save();
+  render();
+  alert(`Withdrew $${amount.toFixed(2)} from POT. New POT balance: $${getCurrentPotBalance().toFixed(2)}`);
+}
+
+// Restore POT money (reverse a withdrawal)
+function restorePotMoney(amount) {
+  data.potWithdrawn = Math.max(0, (Number(data.potWithdrawn) || 0) - (Number(amount) || 0));
+  save();
+  render();
+}

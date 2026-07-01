@@ -60,27 +60,20 @@ ${error.stack}
 
 function switchMainTab(tabName) {
   // Hide all tabs
-  document.getElementById('overviewTab').classList.add('hidden');
+  document.getElementById('homeTab').classList.add('hidden');
   document.getElementById('detailedTab').classList.add('hidden');
-  document.getElementById('weeklyTab').classList.add('hidden');
   
   // Remove active class from all buttons
-  document.getElementById('overviewTabBtn').classList.remove('active');
+  document.getElementById('homeTabBtn').classList.remove('active');
   document.getElementById('detailedTabBtn').classList.remove('active');
-  document.getElementById('weeklyTabBtn').classList.remove('active');
   
   // Show selected tab and mark button active
-  if (tabName === 'overview') {
-    document.getElementById('overviewTab').classList.remove('hidden');
-    document.getElementById('overviewTabBtn').classList.add('active');
+  if (tabName === 'home') {
+    document.getElementById('homeTab').classList.remove('hidden');
+    document.getElementById('homeTabBtn').classList.add('active');
   } else if (tabName === 'detailed') {
     document.getElementById('detailedTab').classList.remove('hidden');
     document.getElementById('detailedTabBtn').classList.add('active');
-  } else if (tabName === 'weekly') {
-    document.getElementById('weeklyTab').classList.remove('hidden');
-    document.getElementById('weeklyTabBtn').classList.add('active');
-    // Auto-scroll to current week when switching to weekly tab
-    setTimeout(() => scrollToCurrentWeek(), 100);
   }
 }
 
@@ -101,44 +94,49 @@ function renderMetrics() {
   const daysRemaining = lastDayOfMonth - dayOfMonth + 1;
   const percentComplete = Math.round((dayOfMonth / daysInMonth) * 100);
   
-  // Get POT
-  const finalPot = weeks[weeks.length - 1]?.endingPot ?? data.openingPot;
+  // Get the REAL POT balance (finalized weeks only)
+  const realPot = getCurrentPotBalance();
   
-  // Spent in unfinalized weeks only
+  // Calculate this month's spending and allowance (unfinalized weeks only)
   const unfinWeeks = weeks.filter(w => !w.finalized);
   const totalSpentUnfin = unfinWeeks.reduce((sum, week) => sum + (Number(week.used) || 0), 0);
+  const totalAllowanceUnfin = unfinWeeks.reduce((sum, week) => sum + (Number(week.allowance) || 0), 0);
+  const totalAvailableUnfin = totalAllowanceUnfin - totalSpentUnfin;
   
-  // Available in unfinalized weeks
-  const totalAvailableUnfin = unfinWeeks.reduce((sum, week) => sum + (Number(week.leftover) || 0), 0);
-  
-  // CC projection: unfin week spending only (simple version)
-  const ccProjection = totalSpentUnfin;
+  // Calculate if spending pace matches days passed
+  const daysCompletePercent = (dayOfMonth / daysInMonth);
+  const spendingPercent = totalSpentUnfin / Math.max(1, totalAllowanceUnfin);
+  const paceStatus = Math.abs(daysCompletePercent - spendingPercent) < 0.15 
+    ? '✓ On pace' 
+    : (spendingPercent > daysCompletePercent 
+      ? '⚠ Ahead of pace' 
+      : '✓ Behind pace');
 
   document.getElementById("metricCards").innerHTML = `
     <div class="panel metric">
       <div class="label">📊 ${monthName(currentMonth)}</div>
       <div class="value">${daysRemaining > 0 ? daysRemaining : '0'} days</div>
-      <div class="small">${percentComplete}% of month complete</div>
+      <div class="small">${percentComplete}% complete</div>
     </div>
     <div class="panel metric">
       <div class="label">💰 POT Balance</div>
-      <div class="value">${fmt.format(finalPot)}</div>
+      <div class="value">${fmt.format(realPot)}</div>
       <div class="small">Accumulated buffer</div>
     </div>
     <div class="panel metric spent">
-      <div class="label">💸 Spent (unfin)</div>
+      <div class="label">💸 Total spent</div>
       <div class="value">${fmt.format(totalSpentUnfin)}</div>
-      <div class="small">Current month spending</div>
+      <div class="small">This month</div>
     </div>
     <div class="panel metric leftover">
-      <div class="label">✅ Available (unfin)</div>
+      <div class="label">✅ Available</div>
       <div class="value">${fmt.format(totalAvailableUnfin)}</div>
-      <div class="small">Remaining in current weeks</div>
+      <div class="small">Remaining weeks</div>
     </div>
     <div class="panel metric">
-      <div class="label">💳 CC Projection</div>
-      <div class="value">${fmt.format(ccProjection)}</div>
-      <div class="small">If settled today</div>
+      <div class="label">📈 Spending pace</div>
+      <div class="value">${paceStatus}</div>
+      <div class="small">${Math.round(spendingPercent * 100)}% of budget used</div>
     </div>`;
 }
 
@@ -198,7 +196,7 @@ function renderWeeks() {
           <div class="stat"><div class="label">Allowance</div><div class="num">${fmt.format(week.allowance)}</div></div>
           <div class="stat"><div class="label">Spent</div><div class="num">${fmt.format(week.used)}</div></div>
           <div class="stat"><div class="label">Left over</div><div class="num">${fmt.format(week.leftover)}</div></div>
-          <div class="stat potmini"><div class="label">POT after week</div><div class="num">${fmt.format(week.endingPot)}</div></div>
+          <div class="stat potmini"><div class="label">${frozen ? 'POT after week' : 'Would add to POT'}</div><div class="num">${fmt.format(week.leftover)}</div></div>
         </div>
         <details class="expense-details ${frozen ? 'open' : ''}">
           <summary style="cursor:pointer; padding:8px; font-weight:600; color:var(--muted);">
@@ -301,9 +299,9 @@ function renderPlanner() {
 
   const projection = cashProjection();
   const buffer = Number(data.cash.bufferTarget) || 0;
-  document.getElementById("cashInsight").innerHTML = Number(data.cash.cashStart) === 0
-    ? `<b>Manual starting cash is $0.</b> Enter the amount of cash you want the cash-flow planner to start from, otherwise the timeline will look wrong.`
-    : (projection.low < buffer ? `<b>Heads up:</b> lowest projected cash is ${fmt.format(projection.low)}, below your ${fmt.format(buffer)} buffer.` : `<b>Looks okay:</b> lowest projected cash is ${fmt.format(projection.low)}, above your ${fmt.format(buffer)} buffer.`);
+  document.getElementById("cashInsight").innerHTML = projection.low < buffer 
+    ? `<b>Heads up:</b> lowest projected cash is ${fmt.format(projection.low)}, below your ${fmt.format(buffer)} buffer.` 
+    : `<b>Looks okay:</b> lowest projected cash is ${fmt.format(projection.low)}, above your ${fmt.format(buffer)} buffer.`;
 
   document.getElementById("timeline").innerHTML = projection.events.map(event => `
     <div class="event ${event.type}">

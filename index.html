@@ -66,14 +66,14 @@
 
   <!-- Main Tab Navigation -->
   <div class="main-tabs">
-    <button id="overviewTabBtn" class="main-tab active" onclick="switchMainTab('overview')">Overview</button>
+    <button id="homeTabBtn" class="main-tab active" onclick="switchMainTab('home')">Home</button>
     <button id="detailedTabBtn" class="main-tab" onclick="switchMainTab('detailed')">Detailed</button>
-    <button id="weeklyTabBtn" class="main-tab" onclick="switchMainTab('weekly')">Weekly</button>
   </div>
 
-  <!-- TAB 1: OVERVIEW -->
-  <main id="overviewTab" class="main-tab-content active">
+  <!-- TAB 1: HOME (Weekly + Headline Cards) -->
+  <main id="homeTab" class="main-tab-content active">
     <div class="grid cards" id="metricCards"></div>
+    <section class="weeks" id="weeks"></section>
   </main>
 
   <!-- TAB 2: DETAILED -->
@@ -85,6 +85,14 @@
           <div><label>Monthly take-home income</label><input id="income" type="number" step="0.01"></div>
           <div><label>Opening POT</label><input id="openingPot" type="number" step="0.01"></div>
           <div><label>Monthly fixed bills</label><input id="fixedTotal" type="number" step="0.01" disabled></div>
+        </div>
+        <div class="note" style="margin-top: 1rem; padding: 1rem; background: #f9f3e0; border-radius: 4px;">
+          <b>Use POT money:</b><br>
+          <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
+            <input id="potWithdrawAmount" type="number" step="0.01" placeholder="Amount to withdraw" style="flex: 1;">
+            <button class="secondary" onclick="usePotMoney(document.getElementById('potWithdrawAmount').value)">Withdraw</button>
+          </div>
+          <div style="font-size: 0.875rem; margin-top: 0.5rem; color: #666;">This reduces your POT balance when you spend money from your buffer.</div>
         </div>
         <div class="toolbar">
           <button onclick="saveCoreSettings()">Update core budget</button>
@@ -128,7 +136,6 @@
         <button onclick="saveCashSettings()">Update cash flow</button>
       </div>
       <div class="cashsettings">
-        <div><label>Manual starting cash</label><input id="cashStart" type="number" step="0.01"></div>
         <div><label>Paycheck amount</label><input id="paycheckAmount" type="number" step="0.01" data-lockable></div>
         <div><label>Payday 1</label><input id="payday1" type="number" min="1" max="31" data-lockable></div>
         <div><label>Payday 2</label><input id="payday2" type="number" min="1" max="31" data-lockable></div>
@@ -138,7 +145,7 @@
         <div><label>Credit card payment</label><input id="ccPaymentAmount" type="number" step="0.01"></div>
         <div><label>Safety buffer target</label><input id="bufferTarget" type="number" step="0.01"></div>
       </div>
-      <div class="note">I kept a manual starting cash field because a browser app cannot see your bank balance. The cash-flow projection only becomes accurate when you enter the cash you want it to start from. POT is not preloaded here.</div>
+      <div class="note">POT is your accumulated buffer and is not preloaded into the cash-flow timeline. Update your "Paycheck amount" and due dates above to see the timeline below.</div>
       <div class="grid plannergrid">
         <div>
           <div class="toolbar"><button class="secondary" onclick="addPlannedExpense()">+ Add planned expense</button></div>
@@ -153,11 +160,6 @@
         </div>
       </div>
     </section>
-  </main>
-
-  <!-- TAB 3: WEEKLY -->
-  <main id="weeklyTab" class="main-tab-content hidden">
-    <section class="weeks" id="weeks"></section>
   </main>
 </div>
 

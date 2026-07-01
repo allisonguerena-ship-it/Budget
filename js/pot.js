@@ -23,6 +23,29 @@ function getPriorFinalizedPot(monthKey, beforeDate) {
   return pot;
 }
 
+// Get the REAL current POT balance (opening POT + finalized leftovers only)
+function getCurrentPotBalance() {
+  let pot = Number(data.openingPot) || 0;
+  
+  for (const [mk, month] of Object.entries(data.months)) {
+    for (const [idx, finalized] of Object.entries(month.finalizedWeeks || {})) {
+      // Add the leftover from this finalized week
+      pot = Number(finalized.endingPot) || 0;
+    }
+  }
+  
+  // Subtract any POT withdrawals
+  pot -= (Number(data.potWithdrawn) || 0);
+  
+  return pot;
+}
+
+// For UI: show POT changes if this week was finalized
+function getProjectedPotAfterWeek(weekData) {
+  const currentPot = getCurrentPotBalance();
+  return currentPot + weekData.leftover;
+}
+
 function calcWeeks() {
   const month = current();
   const weekArray = [];
