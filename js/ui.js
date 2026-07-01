@@ -89,12 +89,6 @@ let cardIndex = 0; // For swipe navigation
 function renderMetrics() {
   const weeks = calcWeeks();
   const currentMonth = data.currentMonth;
-  const lastDayOfMonth = new Date(currentMonth.split('-')[0], currentMonth.split('-')[1], 0).getDate();
-  const today = new Date();
-  const daysInMonth = lastDayOfMonth;
-  const dayOfMonth = today.getDate();
-  const daysRemaining = lastDayOfMonth - dayOfMonth + 1;
-  const percentComplete = Math.round((dayOfMonth / daysInMonth) * 100);
   cardIndex = 0; // Reset to first card
   
   // Get the REAL POT balance (finalized weeks only)
@@ -106,7 +100,19 @@ function renderMetrics() {
   const totalAllowanceUnfin = unfinWeeks.reduce((sum, week) => sum + (Number(week.allowance) || 0), 0);
   const totalAvailableUnfin = totalAllowanceUnfin - totalSpentUnfin;
   
+  // Find current week
+  const today = new Date();
+  const currentWeekNum = weeks.findIndex(w => {
+    const start = new Date(w.startDate);
+    const end = new Date(w.endDate);
+    return today >= start && today <= end;
+  }) + 1 || 1;
+  const weeksRemaining = Math.max(0, weeks.length - currentWeekNum + 1);
+  
   // Calculate if spending pace matches days passed
+  const today_date = new Date();
+  const daysInMonth = new Date(currentMonth.split('-')[0], currentMonth.split('-')[1], 0).getDate();
+  const dayOfMonth = today_date.getDate();
   const daysCompletePercent = (dayOfMonth / daysInMonth);
   const spendingPercent = totalSpentUnfin / Math.max(1, totalAllowanceUnfin);
   const paceStatus = Math.abs(daysCompletePercent - spendingPercent) < 0.15 
@@ -117,9 +123,9 @@ function renderMetrics() {
 
   document.getElementById("metricCards").innerHTML = `
     <div class="panel metric">
-      <div class="label">📊 ${monthName(currentMonth)}</div>
-      <div class="value">${daysRemaining > 0 ? daysRemaining : '0'} days</div>
-      <div class="small">${percentComplete}% complete</div>
+      <div class="label">📊 Week ${currentWeekNum}</div>
+      <div class="value">${weeksRemaining}</div>
+      <div class="small">weeks left</div>
     </div>
     <div class="panel metric">
       <div class="label">💰 POT Balance</div>
