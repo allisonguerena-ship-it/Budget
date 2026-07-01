@@ -90,7 +90,12 @@ h2 {
 /* iPhone/Mobile optimizations */
 @media (max-width: 768px) {
   body {
-    padding: 14px;
+    padding: 12px;
+    overflow-x: hidden;
+  }
+
+  .wrap {
+    max-width: 100%;
   }
 
   header {

@@ -310,10 +310,10 @@ details.section-card .inside {
   }
 
   .cards {
-    grid-template-columns: repeat(5, minmax(140px, 1fr));
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
+    grid-template-columns: repeat(2, 1fr);
+    overflow-x: visible;
+    -webkit-overflow-scrolling: auto;
+    scroll-behavior: auto;
     gap: 10px;
     padding-bottom: 8px;
   }
@@ -381,10 +381,24 @@ details.section-card .inside {
   .main-tabs {
     gap: 6px;
     padding: 10px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .main-tab {
     padding: 8px 12px;
     font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .panel,
+  .section-card {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .settings,
+  .cashsettings {
+    grid-template-columns: 1fr;
   }
 }
