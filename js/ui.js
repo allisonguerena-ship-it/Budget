@@ -56,6 +56,16 @@ ${error.message}
 ${error.stack}
     </pre>`;
   }
+  
+  // Update locked budget foundation display
+  if (typeof updateBudgetFoundationDisplay === 'function') {
+    try {
+      updateBudgetFoundationDisplay();
+      console.log('✅ [ui.js] Budget foundation display updated');
+    } catch (e) {
+      console.warn('⚠️ [ui.js] Failed to update budget foundation:', e);
+    }
+  }
 }
 
 function switchMainTab(tabName) {

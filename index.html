@@ -38,6 +38,36 @@
   </div>
 </div>
 
+<!-- Onboarding Modal for First-Time Users -->
+<div id="onboardingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; overflow-y:auto;">
+  <div style="background:white; border-radius:24px; padding:2rem; max-width:600px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.3); margin:2rem 0;">
+    <h2 style="margin:0 0 0.5rem 0; font-size:28px; font-weight:850;">Let's Set Up Your Budget 🦑</h2>
+    <p style="color:#8b7567; margin:0 0 1.5rem 0; font-size:14px;">Welcome to Squid Budget! Enter your financial information to get started.</p>
+    
+    <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem;">
+      <label style="display:block; margin-bottom:0.5rem; font-weight:600; font-size:14px; color:#332821;">Monthly take-home income</label>
+      <input id="onboardingIncome" type="number" step="0.01" placeholder="e.g., 5708.68" style="width:100%; padding:0.75rem; border:1px solid #ddd; border-radius:8px; font-size:14px; box-sizing:border-box; margin-bottom:1rem;">
+      
+      <label style="display:block; margin-bottom:0.5rem; font-weight:600; font-size:14px; color:#332821;">Starting POT balance (optional)</label>
+      <input id="onboardingPot" type="number" step="0.01" placeholder="e.g., 500 (or leave blank for $0)" style="width:100%; padding:0.75rem; border:1px solid #ddd; border-radius:8px; font-size:14px; box-sizing:border-box;">
+    </div>
+    
+    <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem;">
+      <label style="display:block; margin-bottom:1rem; font-weight:600; font-size:14px; color:#332821;">Monthly fixed bills (optional)</label>
+      <p style="font-size:12px; color:#8b7567; margin:0 0 1rem 0;">Add recurring costs like rent, insurance, subscriptions, etc. You can edit these later.</p>
+      
+      <div id="onboardingBillsContainer" style="margin-bottom:1rem;"></div>
+      
+      <button type="button" onclick="addBillRow()" style="width:100%; padding:0.75rem; background:#f3c6cf; border:1px solid #e0b0b0; border-radius:8px; color:#332821; font-weight:600; cursor:pointer; font-size:13px;">+ Add another bill</button>
+    </div>
+    
+    <div style="display:flex; gap:0.75rem;">
+      <button onclick="completeOnboarding()" style="flex:1; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Create My Budget</button>
+    </div>
+    <p style="font-size:11px; color:#999; margin-top:1rem; text-align:center;">Your data is saved locally in your browser. No sign-up required.</p>
+  </div>
+</div>
+
 <!-- Welcome Modal for New Users -->
 <div id="welcomeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:998; align-items:center; justify-content:center;">
   <div style="background:white; border-radius:24px; padding:2rem; max-width:500px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
@@ -53,6 +83,26 @@
       <p style="margin-top:1rem;"><strong>POT</strong> is your accumulated savings buffer that grows from finalized weeks.</p>
     </div>
     <button onclick="closeWelcome()" style="width:100%; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s ease;">Get Started</button>
+  </div>
+</div>
+
+<!-- Edit Budget Settings Warning Modal -->
+<div id="editSettingsWarningModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:24px; padding:2rem; max-width:500px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+    <h2 style="margin:0 0 1rem 0; font-size:24px; font-weight:850;">⚠️ Important</h2>
+    <div style="color:#8b7567; font-size:14px; margin-bottom:1.5rem; line-height:1.6;">
+      <p><strong>Changing your income or fixed bills will:</strong></p>
+      <ul style="margin:0.5rem 0; padding-left:1.5rem;">
+        <li>Recalculate weekly allowances for <strong>non-finalized weeks only</strong></li>
+        <li>Leave <strong>finalized weeks unchanged</strong> (they stay locked)</li>
+        <li>Update your POT calculation if affected</li>
+      </ul>
+      <p style="margin-top:1rem;"><strong>Finalized weeks are permanent and won't change.</strong></p>
+    </div>
+    <div style="display:flex; gap:0.75rem;">
+      <button onclick="closeEditWarning(); editBudgetSettings();" style="flex:1; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">I understand, edit settings</button>
+      <button onclick="closeEditWarning();" style="flex:1; padding:0.75rem; background:#f0f0f0; color:#666; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -114,6 +164,43 @@
 
   <!-- TAB 2: DETAILED -->
   <main id="detailedTab" class="main-tab-content hidden">
+    <!-- Locked Budget Foundation -->
+    <section class="section-card" id="budgetFoundationSection">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2>Your Budget Foundation 🔒</h2>
+        <button onclick="showEditSettingsWarning()" style="padding:0.5rem 1rem; background:#f3c6cf; color:#332821; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:12px;">✏️ Edit</button>
+      </div>
+      <p style="font-size:12px; color:#8b7567; margin-bottom:1rem;">These are the core values your budget is built on. Changes affect non-finalized weeks only.</p>
+      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+        <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; border-left:4px solid #f3c6cf;">
+          <div style="font-size:12px; color:#8b7567; margin-bottom:0.5rem; font-weight:600;">Monthly Income</div>
+          <div style="font-size:24px; font-weight:850; color:#332821;">
+            $<span id="foundationIncome">0</span>
+          </div>
+        </div>
+        <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; border-left:4px solid #f3c6cf;">
+          <div style="font-size:12px; color:#8b7567; margin-bottom:0.5rem; font-weight:600;">Starting POT</div>
+          <div style="font-size:24px; font-weight:850; color:#332821;">
+            $<span id="foundationPot">0</span>
+          </div>
+        </div>
+        <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; border-left:4px solid #f3c6cf;">
+          <div style="font-size:12px; color:#8b7567; margin-bottom:0.5rem; font-weight:600;">Monthly Fixed Bills</div>
+          <div style="font-size:24px; font-weight:850; color:#332821;">
+            $<span id="foundationBills">0</span>
+          </div>
+        </div>
+      </div>
+      <details>
+        <summary style="cursor:pointer; font-weight:600; font-size:13px; color:#666; padding:0.5rem 0;">
+          View all fixed bills →
+        </summary>
+        <div style="margin-top:1rem; padding:1rem; background:#f9f6f3; border-radius:8px;">
+          <div id="foundationBillsList"></div>
+        </div>
+      </details>
+    </section>
+
     <section class="grid top">
       <div class="panel">
         <div class="label">Core budget settings</div>
@@ -174,7 +261,6 @@
   </main>
 </div>
 
-  <script src="js/config.js" type="module"></script>
   <script src="js/auth.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/storage-adapter.js"></script>
@@ -182,6 +268,7 @@
   <script src="js/auth-ui.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/onboarding.js"></script>
   <script src="js/budget.js"></script>
   <script src="js/pot.js"></script>
   <script src="js/fixedBills.js"></script>
@@ -193,10 +280,135 @@
   <script src="js/backup.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/config.js" type="module"></script>
 
   <script>
-    // Show welcome modal for new users only
+    // Onboarding detection function (inline for guaranteed loading)
+    function isFirstTimeUser() {
+      const completed = localStorage.getItem('squid_onboarding_completed');
+      if (completed) return false;
+      
+      const saved = localStorage.getItem('alli_pot_budget_app_v5');
+      if (saved) {
+        localStorage.setItem('squid_onboarding_completed', 'true');
+        return false;
+      }
+      
+      return true;
+    }
+    
+    // Onboarding functions (inline for guaranteed loading)
+    function showOnboarding() {
+      console.log('🎯 showOnboarding() called');
+      const modal = document.getElementById('onboardingModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        const incomeInput = document.getElementById('onboardingIncome');
+        if (incomeInput) setTimeout(() => incomeInput.focus(), 100);
+      }
+    }
+    
+    function hideOnboarding() {
+      const modal = document.getElementById('onboardingModal');
+      if (modal) modal.style.display = 'none';
+    }
+    
+    function completeOnboarding() {
+      const income = parseFloat(document.getElementById('onboardingIncome').value) || 0;
+      const openingPot = parseFloat(document.getElementById('onboardingPot').value) || 0;
+      
+      if (income <= 0) {
+        alert('Please enter a valid monthly income (must be greater than 0)');
+        return;
+      }
+      
+      const billInputs = document.querySelectorAll('.onboarding-bill-row');
+      const fixedBills = [];
+      
+      billInputs.forEach(row => {
+        const nameInput = row.querySelector('.bill-name');
+        const categorySelect = row.querySelector('.bill-category');
+        const amountInput = row.querySelector('.bill-amount');
+        const activeCheckbox = row.querySelector('.bill-active');
+        
+        const name = nameInput ? nameInput.value.trim() : '';
+        const amount = amountInput ? parseFloat(amountInput.value) : 0;
+        
+        if (name && amount > 0) {
+          fixedBills.push({
+            name: name,
+            category: categorySelect ? categorySelect.value : 'Other',
+            amount: amount,
+            active: activeCheckbox ? activeCheckbox.checked : true
+          });
+        }
+      });
+      
+      const monthKey = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
+      
+      const initialData = {
+        currentMonth: monthKey,
+        income: income,
+        openingPot: openingPot,
+        learnedCategories: {},
+        fixedBills: fixedBills.length > 0 ? fixedBills : [{ name: "Placeholder", category: "Other", amount: 0, active: false }],
+        cash: {
+          cashStart: 0,
+          paycheckAmount: income / 2,
+          payday1: 5,
+          payday2: 20,
+          rentDueDay: 30,
+          rentAmount: 0,
+          ccDueDay: 14,
+          ccPaymentAmount: 0,
+          bufferTarget: 2000,
+          locked: true
+        },
+        plannedExpenses: [],
+        months: {}
+      };
+      
+      initialData.months[monthKey] = {
+        weekStarts: [],
+        expenses: [],
+        finalizedWeeks: {}
+      };
+      
+      try {
+        localStorage.setItem('alli_pot_budget_app_v5', JSON.stringify(initialData));
+        localStorage.setItem('squid_onboarding_completed', 'true');
+        hideOnboarding();
+        window.location.reload();
+      } catch (error) {
+        console.error('Failed to save:', error);
+        alert('Failed to save your budget. Please try again.');
+      }
+    }
+    
+    function addBillRow() {
+      const container = document.getElementById('onboardingBillsContainer');
+      if (!container) return;
+      
+      const billRow = document.createElement('div');
+      billRow.className = 'onboarding-bill-row';
+      billRow.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr 1fr 60px 30px; gap: 8px; align-items: center; margin-bottom: 8px; padding: 8px; background: #f9f6f3; border-radius: 8px;';
+      
+      billRow.innerHTML = '<input type="text" class="bill-name" placeholder="e.g., Rent" style="padding:6px; border:1px solid #ddd; border-radius:4px; font-size:13px;"><select class="bill-category" style="padding:6px; border:1px solid #ddd; border-radius:4px; font-size:13px;"><option value="Housing">Housing</option><option value="Car">Car</option><option value="Insurance">Insurance</option><option value="Utilities">Utilities</option><option value="Phone">Phone</option><option value="Subscription">Subscription</option><option value="Dog">Dog</option><option value="Health">Health</option><option value="Debt">Debt</option><option value="Other" selected>Other</option></select><input type="number" class="bill-amount" placeholder="Amount" step="0.01" style="padding:6px; border:1px solid #ddd; border-radius:4px; font-size:13px;"><label style="display:flex; align-items:center; gap:4px; font-size:12px;"><input type="checkbox" class="bill-active" checked> Active</label><button type="button" class="bill-delete" style="padding:4px; background:#f3c6cf; border:none; border-radius:4px; cursor:pointer; font-size:12px;">×</button>';
+      
+      billRow.querySelector('.bill-delete').addEventListener('click', function() {
+        billRow.remove();
+      });
+      
+      container.appendChild(billRow);
+    }
+    
+    // Show welcome modal for new users only (not first-time, already did onboarding)
     function initWelcome() {
+      // Skip welcome if onboarding is showing (first-time user)
+      if (isFirstTimeUser?.() ?? false) {
+        return;
+      }
+      
       const WELCOME_KEY = 'squid_has_seen_welcome';
       const hasSeenWelcome = localStorage.getItem(WELCOME_KEY);
       
