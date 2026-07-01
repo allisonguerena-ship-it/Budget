@@ -19,16 +19,18 @@ function loadData() {
   if (!saved) {
     console.log('💾 [storage.js] No saved data found, creating defaults');
     saved = {
-      currentMonth: tk,
+      currentMonth: "2026-07",
       income: 5708.68,
       openingPot: 463.71,
       learnedCategories: { "trader joes": "Groceries", "trader joes market": "Groceries" },
       fixedBills: [
-        { name: "Rent", category: "Housing", amount: 3098, startDate: tk + "-01", endDate: "", active: true },
-        { name: "Parking", category: "Housing", amount: 125, startDate: tk + "-01", endDate: "", active: true },
-        { name: "Pet rent", category: "Dog", amount: 35, startDate: tk + "-01", endDate: "", active: true },
-        { name: "Car payment", category: "Car", amount: 0, startDate: tk + "-01", endDate: "", active: true },
-        { name: "Subscriptions", category: "Subscription", amount: 0, startDate: tk + "-01", endDate: "", active: true }
+        { name: "Rent", category: "Housing", amount: 2698, active: true },
+        { name: "Utilities", category: "Housing", amount: 80, active: true },
+        { name: "Subscriptions", category: "Subscription", amount: 42.19, active: true },
+        { name: "Loans", category: "Debt", amount: 116, active: true },
+        { name: "Damien fees", category: "Other", amount: 116, active: true },
+        { name: "Car insurance", category: "Car", amount: 164, active: true },
+        { name: "Car payment", category: "Car", amount: 305, active: true }
       ],
       cash: {
         cashStart: 0,
@@ -36,13 +38,13 @@ function loadData() {
         payday1: 5,
         payday2: 20,
         rentDueDay: 30,
-        rentAmount: 3098,
+        rentAmount: 2698,
         ccDueDay: 14,
         ccPaymentAmount: 2500,
         bufferTarget: 2000,
         locked: true
       },
-      plannedExpenses: [{ date: tk + "-15", desc: "Sister bachelorette trip flights", type: "Trip/Travel", amount: 0, paid: false }],
+      plannedExpenses: [{ date: "2026-07-15", desc: "Sister bachelorette trip flights", type: "Trip/Travel", amount: 0, paid: false }],
       months: {}
     };
   }
