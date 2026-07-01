@@ -1,8 +1,10 @@
-// Onboarding module for first-time setup
+// Onboarding module with smart income calculation
 console.log('✅ [onboarding.js] Script loaded');
 
-const STORAGE_KEY = "alli_pot_budget_app_v5";
+// STORAGE_KEY and ONBOARDING_FLAG are defined in storage.js, reuse them
 const ONBOARDING_FLAG = 'squid_onboarding_completed';
+let onboardingCalculatedIncome = 0;
+let onboardingPaycheckFrequency = null; // 1=monthly, 2=twice/month, 26=biweekly, 52=weekly
 
 function isFirstTimeUser() {
   // Check if onboarding has been completed
@@ -29,12 +31,7 @@ function showOnboarding() {
   }
   
   modal.style.display = 'flex';
-  
-  // Focus on first input
-  setTimeout(() => {
-    const incomeInput = document.getElementById('onboardingIncome');
-    if (incomeInput) incomeInput.focus();
-  }, 100);
+  goToOnboardingStep(1);
 }
 
 function hideOnboarding() {
@@ -42,10 +39,143 @@ function hideOnboarding() {
   if (modal) modal.style.display = 'none';
 }
 
+function goToOnboardingStep(step) {
+  console.log(`📍 [onboarding.js] Going to step ${step}`);
+  
+  // Hide all steps
+  const stepElements = [
+    'onboardingStep1',
+    'onboardingStep2', 
+    'onboardingStep3Annual',
+    'onboardingStep3Paycheck',
+    'onboardingStep3PaycheckAmount',
+    'onboardingStep3Monthly',
+    'onboardingStep4Confirm',
+    'onboardingStep5'
+  ];
+  
+  stepElements.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  
+  // Show the requested step
+  const stepIdMap = {
+    1: 'onboardingStep1',
+    2: 'onboardingStep2',
+    3: 'onboardingStep3Annual', // default, will be overridden
+    4: 'onboardingStep4Confirm',
+    5: 'onboardingStep5'
+  };
+  
+  if (stepIdMap[step]) {
+    const el = document.getElementById(stepIdMap[step]);
+    if (el) {
+      el.style.display = 'block';
+    }
+  }
+}
+
+function goToOnboardingIncomeMethod(method) {
+  console.log(`💰 [onboarding.js] Selected income method: ${method}`);
+  
+  if (method === 'annual') {
+    document.getElementById('onboardingStep3Annual').style.display = 'block';
+    document.getElementById('onboardingStep2').style.display = 'none';
+    // Focus input
+    setTimeout(() => document.getElementById('onboardingAnnualSalary')?.focus(), 100);
+  } else if (method === 'paycheck') {
+    document.getElementById('onboardingStep3Paycheck').style.display = 'block';
+    document.getElementById('onboardingStep2').style.display = 'none';
+  } else if (method === 'monthly') {
+    document.getElementById('onboardingStep3Monthly').style.display = 'block';
+    document.getElementById('onboardingStep2').style.display = 'none';
+    setTimeout(() => document.getElementById('onboardingMonthlyIncome')?.focus(), 100);
+  }
+}
+
+function goToOnboardingPaycheckFrequency(frequencyCode) {
+  console.log(`📅 [onboarding.js] Selected paycheck frequency: ${frequencyCode}`);
+  onboardingPaycheckFrequency = parseInt(frequencyCode);
+  document.getElementById('onboardingStep3PaycheckAmount').style.display = 'block';
+  document.getElementById('onboardingStep3Paycheck').style.display = 'none';
+  setTimeout(() => document.getElementById('onboardingPaycheckAmount')?.focus(), 100);
+}
+
+function confirmOnboardingAnnualSalary() {
+  const annualSalary = parseFloat(document.getElementById('onboardingAnnualSalary').value) || 0;
+  
+  if (annualSalary <= 0) {
+    alert('Please enter a valid annual salary');
+    return;
+  }
+  
+  onboardingCalculatedIncome = Math.round((annualSalary / 12) * 100) / 100;
+  console.log(`✅ [onboarding.js] Calculated monthly income from annual: $${onboardingCalculatedIncome}`);
+  
+  // Show confirmation
+  document.getElementById('onboardingConfirmIncome').textContent = `$${onboardingCalculatedIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  document.getElementById('onboardingStep4Confirm').style.display = 'block';
+  document.getElementById('onboardingStep3Annual').style.display = 'none';
+}
+
+function confirmOnboardingPaycheck() {
+  const paycheckAmount = parseFloat(document.getElementById('onboardingPaycheckAmount').value) || 0;
+  
+  if (paycheckAmount <= 0) {
+    alert('Please enter a valid paycheck amount');
+    return;
+  }
+  
+  if (!onboardingPaycheckFrequency) {
+    alert('Please select paycheck frequency');
+    return;
+  }
+  
+  // Calculate monthly based on frequency
+  // 1 = monthly, 2 = twice a month, 26 = biweekly, 52 = weekly
+  const monthlyMultiplier = {
+    1: 1,
+    2: 2,
+    26: 26 / 12, // biweekly = ~26 times per year
+    52: 52 / 12  // weekly = ~52 times per year
+  };
+  
+  onboardingCalculatedIncome = Math.round((paycheckAmount * monthlyMultiplier[onboardingPaycheckFrequency]) * 100) / 100;
+  console.log(`✅ [onboarding.js] Calculated monthly income from paycheck: $${onboardingCalculatedIncome}`);
+  
+  // Show confirmation
+  document.getElementById('onboardingConfirmIncome').textContent = `$${onboardingCalculatedIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  document.getElementById('onboardingStep4Confirm').style.display = 'block';
+  document.getElementById('onboardingStep3PaycheckAmount').style.display = 'none';
+}
+
+function confirmOnboardingMonthly() {
+  const monthlyIncome = parseFloat(document.getElementById('onboardingMonthlyIncome').value) || 0;
+  
+  if (monthlyIncome <= 0) {
+    alert('Please enter a valid monthly income');
+    return;
+  }
+  
+  onboardingCalculatedIncome = Math.round(monthlyIncome * 100) / 100;
+  console.log(`✅ [onboarding.js] Set monthly income: $${onboardingCalculatedIncome}`);
+  
+  // Show confirmation
+  document.getElementById('onboardingConfirmIncome').textContent = `$${onboardingCalculatedIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  document.getElementById('onboardingStep4Confirm').style.display = 'block';
+  document.getElementById('onboardingStep3Monthly').style.display = 'none';
+}
+
 function completeOnboarding() {
   console.log('✅ [onboarding.js] completeOnboarding() called');
-  const income = parseFloat(document.getElementById('onboardingIncome').value) || 0;
-  const openingPot = parseFloat(document.getElementById('onboardingPot').value) || 0;
+  
+  if (!onboardingCalculatedIncome || onboardingCalculatedIncome <= 0) {
+    alert('Please enter a valid income');
+    return;
+  }
+  
+  const income = onboardingCalculatedIncome;
   
   // Collect fixed bills
   const billInputs = document.querySelectorAll('.onboarding-bill-row');
@@ -65,16 +195,12 @@ function completeOnboarding() {
         name: name,
         category: categorySelect ? categorySelect.value : 'Other',
         amount: amount,
-        active: activeCheckbox ? activeCheckbox.checked : true
+        active: activeCheckbox ? activeCheckbox.checked : true,
+        startDate: new Date().toISOString().split('T')[0], // Today's date
+        endDate: null // No end date for open-ended bills
       });
     }
   });
-  
-  // Validate
-  if (income <= 0) {
-    alert('Please enter a valid monthly income (must be greater than 0)');
-    return;
-  }
   
   // Create initial data structure
   const monthKey = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
@@ -82,10 +208,10 @@ function completeOnboarding() {
   const initialData = {
     currentMonth: monthKey,
     income: income,
-    openingPot: openingPot,
+    openingStash: 0, // No starting stash in new flow
     learnedCategories: {},
     fixedBills: fixedBills.length > 0 ? fixedBills : [
-      { name: "Placeholder", category: "Other", amount: 0, active: false }
+      { name: "Placeholder", category: "Other", amount: 0, active: false, startDate: new Date().toISOString().split('T')[0], endDate: null }
     ],
     cash: {
       cashStart: 0,
@@ -104,7 +230,6 @@ function completeOnboarding() {
   };
   
   // Create first month with default week starts
-  // For now, just create empty months - the app will populate it
   initialData.months[monthKey] = {
     weekStarts: [],
     expenses: [],

@@ -145,7 +145,7 @@ function editBudgetSettings() {
 // Update locked settings display
 function updateBudgetFoundationDisplay() {
   const incomeSpan = document.getElementById('foundationIncome');
-  const potSpan = document.getElementById('foundationPot');
+  const stashSpan = document.getElementById('foundationStash');
   const billsSpan = document.getElementById('foundationBills');
   const billsList = document.getElementById('foundationBillsList');
   
@@ -155,7 +155,7 @@ function updateBudgetFoundationDisplay() {
   const formatMoney = (val) => parseFloat(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   
   incomeSpan.textContent = formatMoney(data.income || 0);
-  potSpan.textContent = formatMoney(data.openingPot || 0);
+  stashSpan.textContent = formatMoney(data.openingStash || 0);
   
   const totalBills = data.fixedBills
     .filter(b => b.active !== false)

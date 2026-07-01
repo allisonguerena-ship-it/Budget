@@ -21,7 +21,7 @@ function loadData() {
     saved = {
       currentMonth: "2026-07",
       income: 5708.68,
-      openingPot: 463.71,
+      openingStash: 463.71,
       learnedCategories: { "trader joes": "Groceries", "trader joes market": "Groceries" },
       fixedBills: [
         { name: "Rent", category: "Housing", amount: 2698, active: true },
@@ -50,7 +50,7 @@ function loadData() {
   }
 
   saved.currentMonth ||= tk;
-  saved.openingPot = Number(saved.openingPot ?? saved.startingPot ?? 0) || 0;
+  saved.openingStash = Number(saved.openingStash ?? saved.openingPot ?? saved.startingPot ?? 0) || 0;
   saved.income = Number(saved.income ?? 5708.68) || 0;
   saved.fixedBills ||= [{ name: "Fixed bills legacy total", category: "Other", amount: Number(saved.fixed) || 0, startDate: saved.currentMonth + "-01", endDate: "", active: true }];
   saved.cash ||= { cashStart: 0, paycheckAmount: 2854.34, payday1: 5, payday2: 20, rentDueDay: 30, rentAmount: 3098, ccDueDay: 14, ccPaymentAmount: 0, bufferTarget: 2000, locked: true };

@@ -3,11 +3,11 @@ function finalizeWeek(index) {
   if (!week) return;
   current().finalizedWeeks[index] = {
     date: week.date,
-    startPot: week.startPot,
+    startStash: week.startStash,
     allowance: week.allowance,
     used: week.used,
     leftover: week.leftover,
-    endingPot: week.endingPot,
+    endingStash: week.endingStash,
     fixed: week.fixed,
     finalizedAt: todayISO()
   };
@@ -54,9 +54,34 @@ function addWeek() {
 
 function saveCoreSettings() {
   data.income = Number(document.getElementById("income").value) || 0;
-  data.openingPot = Number(document.getElementById("openingPot").value) || 0;
+  data.openingStash = Number(document.getElementById("openingStash").value) || 0;
   save();
   render();
+}
+
+function updateAllowancePreview() {
+  // Get current values from inputs
+  const income = Number(document.getElementById("income").value) || 0;
+  const fixedBills = Number(document.getElementById("fixedTotal").value) || 0;
+  
+  // Calculate weekly allowance using the formula:
+  // weekly allowance = (monthly income - fixed bills) * 12 / 365 * 7
+  const weeklyAllowance = (income - fixedBills) * 12 / 365 * 7;
+  
+  // Update display elements
+  const allowancePreview = document.getElementById("allowancePreview");
+  const calcPreview = document.getElementById("allowanceCalcPreview");
+  
+  if (allowancePreview) {
+    allowancePreview.textContent = "$" + weeklyAllowance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  
+  if (calcPreview) {
+    const incomeFormatted = income.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const billsFormatted = fixedBills.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const resultFormatted = weeklyAllowance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    calcPreview.textContent = `($${incomeFormatted} − $${billsFormatted}) × 12 ÷ 365 × 7 = $${resultFormatted}`;
+  }
 }
 
 function addExpense(week) {
@@ -96,9 +121,9 @@ function deleteExpense(globalIndex) {
   render();
 }
 
-// Use money from POT
-function usePotMoney(amount) {
-  const currentPot = getCurrentPotBalance();
+// Use money from Stash
+function useStashMoney(amount) {
+  const currentStash = getCurrentStashBalance();
   amount = Number(amount) || 0;
   
   if (amount <= 0) {
@@ -106,20 +131,20 @@ function usePotMoney(amount) {
     return;
   }
   
-  if (amount > currentPot) {
-    alert(`Cannot withdraw $${amount.toFixed(2)}. Current POT balance is only $${currentPot.toFixed(2)}.`);
+  if (amount > currentStash) {
+    alert(`Cannot withdraw $${amount.toFixed(2)}. Current Stash balance is only $${currentStash.toFixed(2)}.`);
     return;
   }
   
-  data.potWithdrawn = (Number(data.potWithdrawn) || 0) + amount;
+  data.stashWithdrawn = (Number(data.stashWithdrawn) || 0) + amount;
   save();
   render();
-  alert(`Withdrew $${amount.toFixed(2)} from POT. New POT balance: $${getCurrentPotBalance().toFixed(2)}`);
+  alert(`Withdrew $${amount.toFixed(2)} from your Stash. New Stash balance: $${getCurrentStashBalance().toFixed(2)}`);
 }
 
-// Restore POT money (reverse a withdrawal)
-function restorePotMoney(amount) {
-  data.potWithdrawn = Math.max(0, (Number(data.potWithdrawn) || 0) - (Number(amount) || 0));
+// Restore Stash money (reverse a withdrawal)
+function restoreStashMoney(amount) {
+  data.stashWithdrawn = Math.max(0, (Number(data.stashWithdrawn) || 0) - (Number(amount) || 0));
   save();
   render();
 }

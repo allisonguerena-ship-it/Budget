@@ -7,7 +7,7 @@ function render() {
     console.log('✅ [ui.js] ensureMonth() succeeded');
     
     document.getElementById("income").value = data.income;
-    document.getElementById("openingPot").value = data.openingPot;
+    document.getElementById("openingStash").value = data.openingStash;
     document.getElementById("fixedTotal").value = monthlyFixedOn(data.currentMonth + "-01").toFixed(2);
     console.log('✅ [ui.js] Set core inputs');
 
@@ -101,12 +101,12 @@ function renderMetrics() {
   const currentMonth = data.currentMonth;
   cardIndex = 0; // Reset to first card
   
-  // Get the REAL POT balance (finalized weeks only)
-  const realPot = getCurrentPotBalance();
+  // Get the REAL Stash balance (finalized weeks only)
+  const currentStash = getCurrentStashBalance();
   
   // Calculate this month's spending and allowance (ALL weeks in current month)
   // Available This Month = sum of all weeks' allowance - total spent across all weeks
-  // This does NOT include POT
+  // This does NOT include Stash
   const totalSpentThisMonth = weeks.reduce((sum, week) => sum + (Number(week.used) || 0), 0);
   const totalAllowanceThisMonth = weeks.reduce((sum, week) => sum + (Number(week.allowance) || 0), 0);
   const availableThisMonth = totalAllowanceThisMonth - totalSpentThisMonth;
@@ -140,9 +140,9 @@ function renderMetrics() {
       <div class="small">${Math.round(spendingPercent * 100)}% of budget used</div>
     </div>
     <div class="panel metric">
-      <div class="label">💰 POT Balance</div>
-      <div class="value">${fmt.format(realPot)}</div>
-      <div class="small">(Finalized weeks only)</div>
+      <div class="label">💰 Current Stash</div>
+      <div class="value">${fmt.format(currentStash)}</div>
+      <div class="small">Money you've saved from completed weeks</div>
     </div>`;
   
   // Add swipe gesture support for cards on mobile
@@ -234,7 +234,7 @@ function renderWeeks() {
         <div class="week-head">
           <div>
             <div class="week-title">Week ${week.i + 1}: ${shortDate(week.date)} – ${shortDate(addDays(week.date, 6))}</div>
-            <div class="small">${frozen ? 'Finalized/frozen. Past math will not rewrite.' : 'Finalize at week end to lock allowance, spending, left over, and POT.'}</div>
+            <div class="small">${frozen ? 'Finalized/frozen. Past math will not rewrite.' : 'Finalize at week end to lock allowance, spending, left over, and Stash.'}</div>
           </div>
           <div class="badge ${frozen ? 'warn' : (ok ? 'good' : 'bad')}">${frozen ? 'Finalized' : (ok ? `${fmt.format(week.leftover)} left` : `${fmt.format(Math.abs(week.leftover))} over`)}</div>
         </div>
@@ -258,7 +258,7 @@ function renderWeeks() {
         </details>
         <div class="expense-actions">
           <div>${frozen ? `<button class="secondary" onclick="unfinalizeWeek(${week.i})">Unfinalize week</button>` : `<button class="secondary" onclick="addExpense(${week.i})">+ Add cost</button> <button onclick="finalizeWeek(${week.i})">Finalize week</button>`}</div>
-          <span class="small">${frozen ? `Frozen on ${week.finalizedAt || 'saved date'}` : `Finalizing adds/removes this week's leftover from POT.`}</span>
+          <span class="small">${frozen ? `Frozen on ${week.finalizedAt || 'saved date'}` : `Finalizing moves this week's leftover to your Stash.`}</span>
         </div>
       </div>`;
   }).join("");

@@ -171,7 +171,7 @@ class StorageAdapter {
       await this.cloudClient.upsertBudget(this.userId, {
         currentMonth: data.currentMonth,
         income: data.income,
-        openingPot: data.openingPot,
+        openingStash: data.openingStash,
         learnedCategories: data.learnedCategories
       });
 
@@ -207,7 +207,7 @@ class StorageAdapter {
     const result = {
       currentMonth: cloudData.budget?.current_month || "",
       income: cloudData.budget?.income || 0,
-      openingPot: cloudData.budget?.opening_pot || 0,
+      openingStash: cloudData.budget?.opening_stash || 0,
       learnedCategories: cloudData.budget?.learned_categories || {},
       fixedBills: cloudData.fixedBills.map(bill => ({
         id: bill.id,

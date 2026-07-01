@@ -41,30 +41,162 @@
 <!-- Onboarding Modal for First-Time Users -->
 <div id="onboardingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; overflow-y:auto;">
   <div style="background:white; border-radius:24px; padding:2rem; max-width:600px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.3); margin:2rem 0;">
-    <h2 style="margin:0 0 0.5rem 0; font-size:28px; font-weight:850;">Let's Set Up Your Budget 🦑</h2>
-    <p style="color:#8b7567; margin:0 0 1.5rem 0; font-size:14px;">Welcome to Squid Budget! Enter your financial information to get started.</p>
     
-    <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem;">
-      <label style="display:block; margin-bottom:0.5rem; font-weight:600; font-size:14px; color:#332821;">Monthly take-home income</label>
-      <input id="onboardingIncome" type="number" step="0.01" placeholder="e.g., 5708.68" style="width:100%; padding:0.75rem; border:1px solid #ddd; border-radius:8px; font-size:14px; box-sizing:border-box; margin-bottom:1rem;">
+    <!-- Step 1: Philosophy -->
+    <div id="onboardingStep1" style="display:block;">
+      <h2 style="margin:0 0 0.5rem 0; font-size:28px; font-weight:850;">Welcome to Squid Budget 🦑</h2>
+      <p style="color:#8b7567; margin:0 0 1.5rem 0; font-size:14px;">How this app works in 1 minute</p>
       
-      <label style="display:block; margin-bottom:0.5rem; font-weight:600; font-size:14px; color:#332821;">Starting POT balance (optional)</label>
-      <input id="onboardingPot" type="number" step="0.01" placeholder="e.g., 500 (or leave blank for $0)" style="width:100%; padding:0.75rem; border:1px solid #ddd; border-radius:8px; font-size:14px; box-sizing:border-box;">
+      <div style="display:flex; flex-direction:column; gap:1rem; margin-bottom:1.5rem;">
+        <div style="background:#f9f6f3; border-radius:12px; padding:1rem; border-left:4px solid #f3c6cf;">
+          <div style="font-weight:600; font-size:14px; color:#332821; margin-bottom:0.3rem;">📅 Budget by the week</div>
+          <div style="font-size:13px; color:#8b7567;">Not by the month. We calculate your weekly spending allowance from your monthly income and bills.</div>
+        </div>
+        
+        <div style="background:#f9f6f3; border-radius:12px; padding:1rem; border-left:4px solid #f3c6cf;">
+          <div style="font-weight:600; font-size:14px; color:#332821; margin-bottom:0.3rem;">💰 Fixed bills reduce your allowance</div>
+          <div style="font-size:13px; color:#8b7567;">Enter your monthly recurring costs (rent, insurance, subscriptions). They're deducted from your weekly allowance automatically.</div>
+        </div>
+        
+        <div style="background:#f9f6f3; border-radius:12px; padding:1rem; border-left:4px solid #f3c6cf;">
+          <div style="font-weight:600; font-size:14px; color:#332821; margin-bottom:0.3rem;">✅ Finalize each week</div>
+          <div style="font-size:13px; color:#8b7567;">At the end of the week, lock it in. Any money left over automatically moves to your Stash (savings).</div>
+        </div>
+        
+        <div style="background:#f9f6f3; border-radius:12px; padding:1rem; border-left:4px solid #f3c6cf;">
+          <div style="font-weight:600; font-size:14px; color:#332821; margin-bottom:0.3rem;">🏦 Your Stash grows safely</div>
+          <div style="font-size:13px; color:#8b7567;">Only finalized weeks add to your Stash. Future or unfinalized weeks never affect what you've saved.</div>
+        </div>
+      </div>
+      
+      <button onclick="goToOnboardingStep(2)" style="width:100%; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Got it, let's set up →</button>
+      <p style="font-size:11px; color:#999; margin-top:1rem; text-align:center;">Your data is saved locally in your browser. No sign-up required.</p>
     </div>
     
-    <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem;">
-      <label style="display:block; margin-bottom:1rem; font-weight:600; font-size:14px; color:#332821;">Monthly fixed bills (optional)</label>
-      <p style="font-size:12px; color:#8b7567; margin:0 0 1rem 0;">Add recurring costs like rent, insurance, subscriptions, etc. You can edit these later.</p>
+    <!-- Step 2: Income calculation -->
+    <div id="onboardingStep2" style="display:none;">
+      <h2 style="margin:0 0 0.5rem 0; font-size:28px; font-weight:850;">How much do you earn? 💰</h2>
+      <p style="color:#8b7567; margin:0 0 1.5rem 0; font-size:14px;">Let's figure out your monthly take-home income</p>
       
-      <div id="onboardingBillsContainer" style="margin-bottom:1rem;"></div>
+      <div style="display:flex; flex-direction:column; gap:1rem; margin-bottom:2rem;">
+        <button onclick="goToOnboardingIncomeMethod('annual')" style="width:100%; padding:1rem; background:#fff; border:2px solid #e8dfd6; border-radius:12px; cursor:pointer; text-align:left; font-size:14px; font-weight:500;">
+          <div style="font-weight:600; color:#332821;">📊 I know my annual salary</div>
+          <div style="font-size:13px; color:#8b7567; margin-top:0.3rem;">Let's divide it into monthly income after taxes</div>
+        </button>
+        
+        <button onclick="goToOnboardingIncomeMethod('paycheck')" style="width:100%; padding:1rem; background:#fff; border:2px solid #e8dfd6; border-radius:12px; cursor:pointer; text-align:left; font-size:14px; font-weight:500;">
+          <div style="font-weight:600; color:#332821;">💵 I know my paycheck amount</div>
+          <div style="font-size:13px; color:#8b7567; margin-top:0.3rem;">Tell me how often and how much, I'll calculate monthly</div>
+        </button>
+        
+        <button onclick="goToOnboardingIncomeMethod('monthly')" style="width:100%; padding:1rem; background:#fff; border:2px solid #e8dfd6; border-radius:12px; cursor:pointer; text-align:left; font-size:14px; font-weight:500;">
+          <div style="font-weight:600; color:#332821;">📱 Just give me the monthly number</div>
+          <div style="font-size:13px; color:#8b7567; margin-top:0.3rem;">You already know your monthly take-home</div>
+        </button>
+      </div>
       
-      <button type="button" onclick="addBillRow()" style="width:100%; padding:0.75rem; background:#f3c6cf; border:1px solid #e0b0b0; border-radius:8px; color:#332821; font-weight:600; cursor:pointer; font-size:13px;">+ Add another bill</button>
+      <button onclick="goToOnboardingStep(1)" style="width:100%; padding:0.75rem; background:transparent; color:#8b7567; border:1px solid #e8dfd6; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">← Back</button>
     </div>
     
-    <div style="display:flex; gap:0.75rem;">
-      <button onclick="completeOnboarding()" style="flex:1; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Create My Budget</button>
+    <!-- Step 3: Annual salary input -->
+    <div id="onboardingStep3Annual" style="display:none;">
+      <h2 style="margin:0 0 0.5rem 0; font-size:28px; font-weight:850;">Your annual salary</h2>
+      <p style="color:#8b7567; margin:0 0 1.5rem 0; font-size:14px;">After taxes (take-home)</p>
+      
+      <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem;">
+        <label style="display:block; margin-bottom:0.5rem; font-weight:600; font-size:14px; color:#332821;">Annual take-home income</label>
+        <input id="onboardingAnnualSalary" type="number" step="0.01" placeholder="e.g., 68,506" style="width:100%; padding:0.75rem; border:1px solid #ddd; border-radius:8px; font-size:14px; box-sizing:border-box;">
+      </div>
+      
+      <div style="display:flex; gap:1rem;">
+        <button onclick="goToOnboardingStep(2)" style="flex:1; padding:0.75rem; background:transparent; color:#8b7567; border:1px solid #e8dfd6; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">← Back</button>
+        <button onclick="confirmOnboardingAnnualSalary()" style="flex:1; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Next →</button>
+      </div>
     </div>
-    <p style="font-size:11px; color:#999; margin-top:1rem; text-align:center;">Your data is saved locally in your browser. No sign-up required.</p>
+    
+    <!-- Step 3: Paycheck frequency -->
+    <div id="onboardingStep3Paycheck" style="display:none;">
+      <h2 style="margin:0 0 0.5rem 0; font-size:28px; font-weight:850;">Your paycheck</h2>
+      <p style="color:#8b7567; margin:0 0 1.5rem 0; font-size:14px;">How often do you get paid?</p>
+      
+      <div style="display:flex; flex-direction:column; gap:1rem; margin-bottom:1.5rem;">
+        <button onclick="goToOnboardingPaycheckFrequency('2')" style="width:100%; padding:0.75rem; background:#fff; border:2px solid #e8dfd6; border-radius:12px; cursor:pointer; text-align:left; font-weight:600; color:#332821; font-size:14px;">2x per month (twice)</button>
+        <button onclick="goToOnboardingPaycheckFrequency('1')" style="width:100%; padding:0.75rem; background:#fff; border:2px solid #e8dfd6; border-radius:12px; cursor:pointer; text-align:left; font-weight:600; color:#332821; font-size:14px;">1x per month (monthly)</button>
+        <button onclick="goToOnboardingPaycheckFrequency('26')" style="width:100%; padding:0.75rem; background:#fff; border:2px solid #e8dfd6; border-radius:12px; cursor:pointer; text-align:left; font-weight:600; color:#332821; font-size:14px;">Bi-weekly (every 2 weeks)</button>
+        <button onclick="goToOnboardingPaycheckFrequency('52')" style="width:100%; padding:0.75rem; background:#fff; border:2px solid #e8dfd6; border-radius:12px; cursor:pointer; text-align:left; font-weight:600; color:#332821; font-size:14px;">Weekly</button>
+      </div>
+      
+      <button onclick="goToOnboardingStep(2)" style="width:100%; padding:0.75rem; background:transparent; color:#8b7567; border:1px solid #e8dfd6; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">← Back</button>
+    </div>
+    
+    <!-- Step 3.5: Paycheck amount -->
+    <div id="onboardingStep3PaycheckAmount" style="display:none;">
+      <h2 style="margin:0 0 0.5rem 0; font-size:28px; font-weight:850;">How much per paycheck?</h2>
+      <p style="color:#8b7567; margin:0 0 1.5rem 0; font-size:14px;">Your take-home per paycheck</p>
+      
+      <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem;">
+        <input id="onboardingPaycheckAmount" type="number" step="0.01" placeholder="e.g., 2854.42" style="width:100%; padding:0.75rem; border:1px solid #ddd; border-radius:8px; font-size:14px; box-sizing:border-box;">
+      </div>
+      
+      <div style="display:flex; gap:1rem;">
+        <button onclick="goToOnboardingStep(2)" style="flex:1; padding:0.75rem; background:transparent; color:#8b7567; border:1px solid #e8dfd6; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">← Back</button>
+        <button onclick="confirmOnboardingPaycheck()" style="flex:1; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Next →</button>
+      </div>
+    </div>
+    
+    <!-- Step 3: Monthly income input -->
+    <div id="onboardingStep3Monthly" style="display:none;">
+      <h2 style="margin:0 0 0.5rem 0; font-size:28px; font-weight:850;">Monthly income</h2>
+      <p style="color:#8b7567; margin:0 0 1.5rem 0; font-size:14px;">Your take-home per month</p>
+      
+      <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem;">
+        <input id="onboardingMonthlyIncome" type="number" step="0.01" placeholder="e.g., 5708.68" style="width:100%; padding:0.75rem; border:1px solid #ddd; border-radius:8px; font-size:14px; box-sizing:border-box;">
+      </div>
+      
+      <div style="display:flex; gap:1rem;">
+        <button onclick="goToOnboardingStep(2)" style="flex:1; padding:0.75rem; background:transparent; color:#8b7567; border:1px solid #e8dfd6; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">← Back</button>
+        <button onclick="confirmOnboardingMonthly()" style="flex:1; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Next →</button>
+      </div>
+    </div>
+    
+    <!-- Step 4: Confirm calculated income -->
+    <div id="onboardingStep4Confirm" style="display:none;">
+      <h2 style="margin:0 0 0.5rem 0; font-size:28px; font-weight:850;">Got it! 📊</h2>
+      <p style="color:#8b7567; margin:0 0 1.5rem 0; font-size:14px;">Here's what I calculated</p>
+      
+      <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; text-align:center;">
+        <div style="font-size:14px; color:#8b7567; margin-bottom:0.5rem;">Monthly take-home income</div>
+        <div style="font-size:32px; font-weight:700; color:#332821;" id="onboardingConfirmIncome">$0</div>
+      </div>
+      
+      <p style="color:#8b7567; font-size:13px; margin-bottom:1.5rem; text-align:center;">Does this look right?</p>
+      
+      <div style="display:flex; gap:1rem;">
+        <button onclick="goToOnboardingStep(2)" style="flex:1; padding:0.75rem; background:transparent; color:#8b7567; border:1px solid #e8dfd6; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Nope, try again</button>
+        <button onclick="goToOnboardingStep(5)" style="flex:1; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Looks good! →</button>
+      </div>
+    </div>
+    
+    <!-- Step 5: Fixed bills setup -->
+    <div id="onboardingStep5" style="display:none;">
+      <h2 style="margin:0 0 0.5rem 0; font-size:28px; font-weight:850;">Monthly fixed bills</h2>
+      <p style="color:#8b7567; margin:0 0 1.5rem 0; font-size:14px;">Rent, insurance, subscriptions, etc. (optional)</p>
+      
+      <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem;">
+        <label style="display:block; margin-bottom:1rem; font-weight:600; font-size:14px; color:#332821;">Monthly fixed bills (optional)</label>
+        <p style="font-size:12px; color:#8b7567; margin:0 0 1rem 0;">Add recurring costs like rent, insurance, subscriptions, etc. You can edit these later.</p>
+        
+        <div id="onboardingBillsContainer" style="margin-bottom:1rem;"></div>
+        
+        <button type="button" onclick="addBillRow()" style="width:100%; padding:0.75rem; background:#f3c6cf; border:1px solid #e0b0b0; border-radius:8px; color:#332821; font-weight:600; cursor:pointer; font-size:13px;">+ Add another bill</button>
+      </div>
+      
+      <div style="display:flex; gap:0.75rem;">
+        <button onclick="goToOnboardingStep(1)" style="flex:1; padding:0.75rem; background:#f0f0f0; color:#666; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">← Back</button>
+        <button onclick="completeOnboarding()" style="flex:1; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Create My Budget →</button>
+      </div>
+    </div>
+    
   </div>
 </div>
 
@@ -77,10 +209,10 @@
       <ul style="margin:0.5rem 0; padding-left:1.5rem;">
         <li><strong>Weekly Allowance:</strong> Calculate how much you can spend each week based on your income and fixed bills</li>
         <li><strong>Fixed Bills:</strong> Keep track of recurring monthly costs that affect your budget</li>
-        <li><strong>Week Planning:</strong> Finalize weeks to lock in your spending and build your POT savings</li>
+        <li><strong>Week Planning:</strong> Finalize weeks to lock in your spending and build your Stash</li>
         <li><strong>Cash Flow:</strong> See paychecks, due dates, and planned expenses in a timeline</li>
       </ul>
-      <p style="margin-top:1rem;"><strong>POT</strong> is your accumulated savings buffer that grows from finalized weeks.</p>
+      <p style="margin-top:1rem;"><strong>Stash</strong> is your accumulated savings that grows from finalized weeks.</p>
     </div>
     <button onclick="closeWelcome()" style="width:100%; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s ease;">Get Started</button>
   </div>
@@ -89,15 +221,22 @@
 <!-- Edit Budget Settings Warning Modal -->
 <div id="editSettingsWarningModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999; align-items:center; justify-content:center;">
   <div style="background:white; border-radius:24px; padding:2rem; max-width:500px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
-    <h2 style="margin:0 0 1rem 0; font-size:24px; font-weight:850;">⚠️ Important</h2>
+    <h2 style="margin:0 0 1rem 0; font-size:24px; font-weight:850;">⚠️ Editing Budget Settings</h2>
     <div style="color:#8b7567; font-size:14px; margin-bottom:1.5rem; line-height:1.6;">
-      <p><strong>Changing your income or fixed bills will:</strong></p>
+      <p><strong>These values are your budget foundation.</strong> Changing them will:</p>
       <ul style="margin:0.5rem 0; padding-left:1.5rem;">
         <li>Recalculate weekly allowances for <strong>non-finalized weeks only</strong></li>
         <li>Leave <strong>finalized weeks unchanged</strong> (they stay locked)</li>
-        <li>Update your POT calculation if affected</li>
+        <li>Update your Stash calculation if affected</li>
       </ul>
       <p style="margin-top:1rem;"><strong>Finalized weeks are permanent and won't change.</strong></p>
+    </div>
+    <div style="display:flex; gap:0.75rem;">
+      <button onclick="closeEditWarning(); editBudgetSettings();" style="flex:1; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">I understand, edit</button>
+      <button onclick="closeEditWarning();" style="flex:1; padding:0.75rem; background:#f0f0f0; color:#666; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Cancel</button>
+    </div>
+  </div>
+</div>
     </div>
     <div style="display:flex; gap:0.75rem;">
       <button onclick="closeEditWarning(); editBudgetSettings();" style="flex:1; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">I understand, edit settings</button>
@@ -179,9 +318,9 @@
           </div>
         </div>
         <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; border-left:4px solid #f3c6cf;">
-          <div style="font-size:12px; color:#8b7567; margin-bottom:0.5rem; font-weight:600;">Starting POT</div>
+          <div style="font-size:12px; color:#8b7567; margin-bottom:0.5rem; font-weight:600;">Starting Stash</div>
           <div style="font-size:24px; font-weight:850; color:#332821;">
-            $<span id="foundationPot">0</span>
+            $<span id="foundationStash">0</span>
           </div>
         </div>
         <div style="background:#f9f6f3; border-radius:12px; padding:1.5rem; border-left:4px solid #f3c6cf;">
@@ -205,10 +344,21 @@
       <div class="panel">
         <div class="label">Core budget settings</div>
         <div class="settings">
-          <div><label>Monthly take-home income</label><input id="income" type="number" step="0.01"></div>
-          <div><label>Opening POT</label><input id="openingPot" type="number" step="0.01"></div>
+          <div><label>Monthly take-home income</label><input id="income" type="number" step="0.01" oninput="updateAllowancePreview()"></div>
+          <div><label>Starting Stash</label><input id="openingStash" type="number" step="0.01"></div>
           <div><label>Monthly fixed bills</label><input id="fixedTotal" type="number" step="0.01" disabled></div>
         </div>
+        
+        <!-- Live calculation display -->
+        <div style="background: #f9f6f3; border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; margin-bottom: 1rem;">
+          <div style="font-size: 13px; color: #8b7567; margin-bottom: 0.75rem; font-weight: 500;">💰 Your weekly allowance</div>
+          <div style="font-size: 28px; font-weight: 700; color: #332821; margin-bottom: 1rem;" id="allowancePreview">$1,038.46</div>
+          <div style="font-size: 12px; color: #999; line-height: 1.5; font-family: monospace;">
+            Formula: (monthly income − fixed bills) × 12 ÷ 365 × 7<br>
+            <span id="allowanceCalcPreview">($5,708.83 − $0) × 12 ÷ 365 × 7 = $1,038.46</span>
+          </div>
+        </div>
+        
         <div class="toolbar">
           <button onclick="saveCoreSettings()">Update core budget</button>
           <button class="secondary" onclick="addWeek()">+ Add next 7-day week</button>
@@ -243,7 +393,7 @@
         <div><label>Credit card payment</label><input id="ccPaymentAmount" type="number" step="0.01"></div>
         <div><label>Safety buffer target</label><input id="bufferTarget" type="number" step="0.01"></div>
       </div>
-      <div class="note">POT is your accumulated buffer and is not preloaded into the cash-flow timeline. Update your "Paycheck amount" and due dates above to see the timeline below.</div>
+      <div class="note">Stash is your accumulated savings and is not preloaded into the cash-flow timeline. Update your "Paycheck amount" and due dates above to see the timeline below.</div>
       <div class="grid plannergrid">
         <div>
           <div class="toolbar"><button class="secondary" onclick="addPlannedExpense()">+ Add planned expense</button></div>
@@ -297,114 +447,14 @@
       return true;
     }
     
-    // Onboarding functions (inline for guaranteed loading)
-    function showOnboarding() {
-      console.log('🎯 showOnboarding() called');
-      const modal = document.getElementById('onboardingModal');
-      if (modal) {
-        modal.style.display = 'flex';
-        const incomeInput = document.getElementById('onboardingIncome');
-        if (incomeInput) setTimeout(() => incomeInput.focus(), 100);
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      if (isFirstTimeUser()) {
+        showOnboarding();
       }
-    }
-    
-    function hideOnboarding() {
-      const modal = document.getElementById('onboardingModal');
-      if (modal) modal.style.display = 'none';
-    }
-    
-    function completeOnboarding() {
-      const income = parseFloat(document.getElementById('onboardingIncome').value) || 0;
-      const openingPot = parseFloat(document.getElementById('onboardingPot').value) || 0;
-      
-      if (income <= 0) {
-        alert('Please enter a valid monthly income (must be greater than 0)');
-        return;
-      }
-      
-      const billInputs = document.querySelectorAll('.onboarding-bill-row');
-      const fixedBills = [];
-      
-      billInputs.forEach(row => {
-        const nameInput = row.querySelector('.bill-name');
-        const categorySelect = row.querySelector('.bill-category');
-        const amountInput = row.querySelector('.bill-amount');
-        const activeCheckbox = row.querySelector('.bill-active');
-        
-        const name = nameInput ? nameInput.value.trim() : '';
-        const amount = amountInput ? parseFloat(amountInput.value) : 0;
-        
-        if (name && amount > 0) {
-          fixedBills.push({
-            name: name,
-            category: categorySelect ? categorySelect.value : 'Other',
-            amount: amount,
-            active: activeCheckbox ? activeCheckbox.checked : true
-          });
-        }
-      });
-      
-      const monthKey = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
-      
-      const initialData = {
-        currentMonth: monthKey,
-        income: income,
-        openingPot: openingPot,
-        learnedCategories: {},
-        fixedBills: fixedBills.length > 0 ? fixedBills : [{ name: "Placeholder", category: "Other", amount: 0, active: false }],
-        cash: {
-          cashStart: 0,
-          paycheckAmount: income / 2,
-          payday1: 5,
-          payday2: 20,
-          rentDueDay: 30,
-          rentAmount: 0,
-          ccDueDay: 14,
-          ccPaymentAmount: 0,
-          bufferTarget: 2000,
-          locked: true
-        },
-        plannedExpenses: [],
-        months: {}
-      };
-      
-      initialData.months[monthKey] = {
-        weekStarts: [],
-        expenses: [],
-        finalizedWeeks: {}
-      };
-      
-      try {
-        localStorage.setItem('alli_pot_budget_app_v5', JSON.stringify(initialData));
-        localStorage.setItem('squid_onboarding_completed', 'true');
-        hideOnboarding();
-        window.location.reload();
-      } catch (error) {
-        console.error('Failed to save:', error);
-        alert('Failed to save your budget. Please try again.');
-      }
-    }
-    
-    function addBillRow() {
-      const container = document.getElementById('onboardingBillsContainer');
-      if (!container) return;
-      
-      const billRow = document.createElement('div');
-      billRow.className = 'onboarding-bill-row';
-      billRow.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr 1fr 60px 30px; gap: 8px; align-items: center; margin-bottom: 8px; padding: 8px; background: #f9f6f3; border-radius: 8px;';
-      
-      billRow.innerHTML = '<input type="text" class="bill-name" placeholder="e.g., Rent" style="padding:6px; border:1px solid #ddd; border-radius:4px; font-size:13px;"><select class="bill-category" style="padding:6px; border:1px solid #ddd; border-radius:4px; font-size:13px;"><option value="Housing">Housing</option><option value="Car">Car</option><option value="Insurance">Insurance</option><option value="Utilities">Utilities</option><option value="Phone">Phone</option><option value="Subscription">Subscription</option><option value="Dog">Dog</option><option value="Health">Health</option><option value="Debt">Debt</option><option value="Other" selected>Other</option></select><input type="number" class="bill-amount" placeholder="Amount" step="0.01" style="padding:6px; border:1px solid #ddd; border-radius:4px; font-size:13px;"><label style="display:flex; align-items:center; gap:4px; font-size:12px;"><input type="checkbox" class="bill-active" checked> Active</label><button type="button" class="bill-delete" style="padding:4px; background:#f3c6cf; border:none; border-radius:4px; cursor:pointer; font-size:12px;">×</button>';
-      
-      billRow.querySelector('.bill-delete').addEventListener('click', function() {
-        billRow.remove();
-      });
-      
-      container.appendChild(billRow);
-    }
-    
-    // Show welcome modal for new users only (not first-time, already did onboarding)
-    function initWelcome() {
-      // Skip welcome if onboarding is showing (first-time user)
+      // app.js handles the rest of initialization
+    });
+  </script>
       if (isFirstTimeUser?.() ?? false) {
         return;
       }

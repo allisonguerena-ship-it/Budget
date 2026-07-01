@@ -28,7 +28,7 @@ class SupabaseDataClient {
         user_id: userId,
         current_month: budgetData.currentMonth,
         income: budgetData.income,
-        opening_pot: budgetData.openingPot,
+        opening_pot: budgetData.openingStash,
         learned_categories: budgetData.learnedCategories || {},
         updated_at: new Date().toISOString()
       }, { onConflict: "user_id" })
