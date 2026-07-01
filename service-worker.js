@@ -1,4 +1,4 @@
-const CACHE_NAME = "squid-budget-v5";
+const CACHE_NAME = "squid-budget-v6";
 const ASSETS = [
 	"./",
 	"./index.html",
