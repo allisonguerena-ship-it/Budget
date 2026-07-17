@@ -237,13 +237,6 @@
     </div>
   </div>
 </div>
-    </div>
-    <div style="display:flex; gap:0.75rem;">
-      <button onclick="closeEditWarning(); editBudgetSettings();" style="flex:1; padding:0.75rem; background:#f3c6cf; color:#332821; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">I understand, edit settings</button>
-      <button onclick="closeEditWarning();" style="flex:1; padding:0.75rem; background:#f0f0f0; color:#666; border:none; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Cancel</button>
-    </div>
-  </div>
-</div>
 
 <div class="wrap">
   <header>
@@ -454,27 +447,6 @@
       }
       // app.js handles the rest of initialization
     });
-  </script>
-      if (isFirstTimeUser?.() ?? false) {
-        return;
-      }
-      
-      const WELCOME_KEY = 'squid_has_seen_welcome';
-      const hasSeenWelcome = localStorage.getItem(WELCOME_KEY);
-      
-      if (!hasSeenWelcome) {
-        document.getElementById('welcomeModal').style.display = 'flex';
-      }
-    }
-    
-    function closeWelcome() {
-      const WELCOME_KEY = 'squid_has_seen_welcome';
-      localStorage.setItem(WELCOME_KEY, 'true');
-      document.getElementById('welcomeModal').style.display = 'none';
-    }
-    
-    // Show welcome on page load if it's the user's first visit
-    document.addEventListener('DOMContentLoaded', initWelcome);
   </script>
 
 </body>
